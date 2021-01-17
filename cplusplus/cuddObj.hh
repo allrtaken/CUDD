@@ -64,7 +64,7 @@ class ADD;
 class ZDD;
 class Cudd;
 
-typedef void (*PFC)(std::string);	// handler function type
+typedef void (*PFC)(std::string); // handler function type
 
 /*---------------------------------------------------------------------------*/
 /* Class definitions                                                         */
@@ -85,8 +85,7 @@ protected:
     DdNode *node;
     inline DdManager * checkSameManager(const DD &other) const;
     inline void checkReturnValue(const void *result) const;
-    inline void checkReturnValue(int result, int expected = 1)
-	const;
+    inline void checkReturnValue(int result, int expected = 1) const;
     DD();
     DD(Capsule *cap, DdNode *ddNode);
     DD(Cudd const & manager, DdNode *ddNode);
@@ -144,8 +143,7 @@ public:
     BDD Support() const;
     int SupportSize() const;
     std::vector<unsigned int> SupportIndices() const;
-    void ClassifySupport(const ABDD& g, BDD* common, BDD* onlyF, BDD* onlyG)
-	const;
+    void ClassifySupport(const ABDD& g, BDD* common, BDD* onlyF, BDD* onlyG) const;
     int CountLeaves() const;
     double Density(int nvars) const;
 
@@ -187,8 +185,7 @@ public:
     friend std::ostream & operator<<(std::ostream & os, BDD const & f);
     bool IsZero() const;
     bool IsVar() const;
-    BDD AndAbstract(const BDD& g, const BDD& cube, unsigned int limit = 0)
-	const;
+    BDD AndAbstract(const BDD& g, const BDD& cube, unsigned int limit = 0) const;
     BDD UnderApprox(
       int numVars,
       int threshold = 0,
@@ -199,13 +196,11 @@ public:
       int threshold = 0,
       bool safe = false,
       double quality = 1.0) const;
-    BDD RemapUnderApprox(int numVars, int threshold = 0, double quality = 1.0)
-	const;
-    BDD RemapOverApprox(int numVars, int threshold = 0, double quality = 1.0)
-	const;
-    BDD BiasedUnderApprox(const BDD& bias, int numVars, int threshold = 0, 
+    BDD RemapUnderApprox(int numVars, int threshold = 0, double quality = 1.0) const;
+    BDD RemapOverApprox(int numVars, int threshold = 0, double quality = 1.0) const;
+    BDD BiasedUnderApprox(const BDD& bias, int numVars, int threshold = 0,
                           double quality1 = 1.0, double quality0 = 1.0) const;
-    BDD BiasedOverApprox(const BDD& bias, int numVars, int threshold = 0, 
+    BDD BiasedOverApprox(const BDD& bias, int numVars, int threshold = 0,
                          double quality1 = 1.0, double quality0 = 1.0) const;
     BDD ExistAbstract(const BDD& cube, unsigned int limit = 0) const;
     BDD XorExistAbstract(const BDD& g, const BDD& cube) const;
@@ -227,8 +222,7 @@ public:
     ADD Add() const;
     BDD Transfer(Cudd& destination) const;
     BDD ClippingAnd(const BDD& g, int maxDepth, int direction = 0) const;
-    BDD ClippingAndAbstract(const BDD& g, const BDD& cube, int maxDepth,
-			    int direction = 0) const;
+    BDD ClippingAndAbstract(const BDD& g, const BDD& cube, int maxDepth, int direction = 0) const;
     BDD Cofactor(const BDD& g) const;
     bool VarAreSymmetric(int index1, int index2) const;
     BDD Compose(const BDD& g, int v) const;
@@ -257,8 +251,7 @@ public:
     BDD SubsetCompress(int nvars, int threshold) const;
     BDD SupersetCompress(int nvars, int threshold) const;
     BDD LiteralSetIntersection(const BDD& g) const;
-    BDD PrioritySelect(std::vector<BDD> x, std::vector<BDD> y,
-		       std::vector<BDD> z, const BDD& Pi, DD_PRFP Pifunc) const;
+    BDD PrioritySelect(std::vector<BDD> x, std::vector<BDD> y, std::vector<BDD> z, const BDD& Pi, DD_PRFP Pifunc) const;
     BDD CProjection(const BDD& Y) const;
     int MinHammingDist(int *minterm, int upperBound) const;
     BDD Eval(int * inputs) const;
@@ -627,14 +620,10 @@ public:
     int ApaNumberOfDigits(int binaryDigits) const;
     DdApaNumber NewApaNumber(int digits) const;
     void ApaCopy(int digits, DdApaNumber source, DdApaNumber dest) const;
-    DdApaDigit ApaAdd(int digits, DdApaNumber a, DdApaNumber b, DdApaNumber
-		      sum) const;
-    DdApaDigit ApaSubtract(int digits, DdApaNumber a, DdApaNumber b,
-			   DdApaNumber diff) const;
-    DdApaDigit ApaShortDivision(int digits, DdApaNumber dividend, DdApaDigit
-				divisor, DdApaNumber quotient) const;
-    void ApaShiftRight(int digits, DdApaDigit in, DdApaNumber a, DdApaNumber
-		       b) const;
+    DdApaDigit ApaAdd(int digits, DdApaNumber a, DdApaNumber b, DdApaNumber sum) const;
+    DdApaDigit ApaSubtract(int digits, DdApaNumber a, DdApaNumber b, DdApaNumber diff) const;
+    DdApaDigit ApaShortDivision(int digits, DdApaNumber dividend, DdApaDigit divisor, DdApaNumber quotient) const;
+    void ApaShiftRight(int digits, DdApaDigit in, DdApaNumber a, DdApaNumber b) const;
     void ApaSetToLiteral(int digits, DdApaNumber number, DdApaDigit literal)
       const;
     void ApaPowerOfTwo(int digits, DdApaNumber number, int power) const;
@@ -692,43 +681,43 @@ public:
     void zddShuffleHeap(int * permutation) const;
     void zddSymmProfile(int lower, int upper) const;
     void DumpDot(
-      const std::vector<BDD>& nodes, 
-      char const * const * inames = 0, 
-      char const * const * onames = 0, 
+      const std::vector<BDD>& nodes,
+      char const * const * inames = 0,
+      char const * const * onames = 0,
       FILE * fp = stdout) const;
     void DumpDaVinci(
-      const std::vector<BDD>& nodes, 
+      const std::vector<BDD>& nodes,
       char const * const * inames = 0,
       char const * const * onames = 0,
       FILE * fp = stdout) const;
     void DumpBlif(
-      const std::vector<BDD>& nodes, 
+      const std::vector<BDD>& nodes,
       char const * const * inames = 0,
       char const * const * onames = 0,
       char * mname = 0,
       FILE * fp = stdout,
       int mv = 0) const;
     void DumpDDcal(
-      const std::vector<BDD>& nodes, 
-      char const * const * inames = 0, 
-      char const * const * onames = 0, 
+      const std::vector<BDD>& nodes,
+      char const * const * inames = 0,
+      char const * const * onames = 0,
       FILE * fp = stdout) const;
     void DumpFactoredForm(
-      const std::vector<BDD>& nodes, 
+      const std::vector<BDD>& nodes,
       char const * const * inames = 0,
       char const * const * onames = 0,
       FILE * fp = stdout) const;
     BDD VectorSupport(const std::vector<BDD>& roots) const;
-    std::vector<unsigned int> 
+    std::vector<unsigned int>
     SupportIndices(const std::vector<BDD>& roots) const;
-    std::vector<unsigned int> 
+    std::vector<unsigned int>
     SupportIndices(const std::vector<ADD>& roots) const;
     int nodeCount(const std::vector<BDD>& roots) const;
     int VectorSupportSize(const std::vector<BDD>& roots) const;
     void DumpDot(
       const std::vector<ADD>& nodes,
-      char const * const * inames = 0, 
-      char const * const * onames = 0, 
+      char const * const * inames = 0,
+      char const * const * onames = 0,
       FILE * fp = stdout) const;
     void DumpDaVinci(
       const std::vector<ADD>& nodes,

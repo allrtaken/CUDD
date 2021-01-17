@@ -114,8 +114,7 @@ Capsule::Capsule(
     timeoutHandler = defaultHandler;
     terminationHandler = defaultHandler;
     manager = Cudd_Init(numVars, numVarsZ, numSlots, cacheSize, maxMemory);
-    if (!manager)
-        errorHandler("Out of memory");
+    if (!manager) errorHandler("Out of memory");
     verbose = 0; // initially terse
     ref = 1;
 
@@ -137,7 +136,7 @@ Capsule::~Capsule()
     for (vector<char *>::iterator it = varnames.begin();
          it != varnames.end(); ++it) {
         delete [] *it;
-    }   
+    }
     Cudd_Quit(manager);
 
 } // Capsule::~Capsule
@@ -154,8 +153,7 @@ DD::DD() : p(0), node(0) {}
 DD::DD(Capsule *cap, DdNode *ddNode) : p(cap), node(ddNode) {
     if (node) Cudd_Ref(node);
     if (p->verbose) {
-	cout << "Standard DD constructor for node " << hex << node << dec <<
-	    " ref = " << Cudd_Regular(node)->ref << "\n";
+        cout << "Standard DD constructor for node " << hex << node << dec << " ref = " << Cudd_Regular(node)->ref << "\n";
     }
 
 } // DD::DD
@@ -165,8 +163,7 @@ DD::DD(Cudd const & manager, DdNode *ddNode) : p(manager.p), node(ddNode) {
     checkReturnValue(ddNode);
     if (node) Cudd_Ref(node);
     if (p->verbose) {
-	cout << "Standard DD constructor for node " << hex << node << dec <<
-	    " ref = " << Cudd_Regular(node)->ref << "\n";
+        cout << "Standard DD constructor for node " << hex << node << dec << " ref = " << Cudd_Regular(node)->ref << "\n";
     }
 
 } // DD::DD
@@ -176,11 +173,10 @@ DD::DD(const DD &from) {
     p = from.p;
     node = from.node;
     if (node) {
-	Cudd_Ref(node);
-	if (p->verbose) {
-	    cout << "Copy DD constructor for node " << hex << node << dec <<
-		" ref = " << Cudd_Regular(node)->ref << "\n";
-	}
+        Cudd_Ref(node);
+        if (p->verbose) {
+            cout << "Copy DD constructor for node " << hex << node << dec << " ref = " << Cudd_Regular(node)->ref << "\n";
+        }
     }
 
 } // DD::DD
@@ -195,7 +191,7 @@ DD::checkSameManager(
 {
     DdManager *mgr = p->manager;
     if (mgr != other.p->manager) {
-	p->errorHandler("Operands come from different manager.");
+        p->errorHandler("Operands come from different manager.");
     }
     return mgr;
 
@@ -207,43 +203,42 @@ DD::checkReturnValue(
   const void *result) const
 {
     if (result == 0) {
-	DdManager *mgr = p->manager;
-	Cudd_ErrorType errType = Cudd_ReadErrorCode(mgr);
-	switch (errType) {
-	case CUDD_MEMORY_OUT:
-	    p->errorHandler("Out of memory.");
-	    break;
-	case CUDD_TOO_MANY_NODES:
-	    break;
-	case CUDD_MAX_MEM_EXCEEDED:
-	    p->errorHandler("Maximum memory exceeded.");
-	    break;
-        case CUDD_TIMEOUT_EXPIRED: 
-            {
-                std::ostringstream msg;
-                unsigned long lag = 
-                    Cudd_ReadElapsedTime(mgr) - Cudd_ReadTimeLimit(mgr);
-                msg << "Timeout expired.  Lag = " << lag << " ms.";
-                p->timeoutHandler(msg.str());
-            }
-	    break;
-        case CUDD_TERMINATION:
-            {
-                std::ostringstream msg;
-                msg << "Terminated.\n";
-                p->terminationHandler(msg.str());
-            }
+        DdManager *mgr = p->manager;
+        Cudd_ErrorType errType = Cudd_ReadErrorCode(mgr);
+        switch (errType) {
+            case CUDD_MEMORY_OUT:
+                p->errorHandler("Out of memory.");
+                break;
+            case CUDD_TOO_MANY_NODES:
+                break;
+            case CUDD_MAX_MEM_EXCEEDED:
+                p->errorHandler("Maximum memory exceeded.");
+                break;
+            case CUDD_TIMEOUT_EXPIRED:
+                {
+                    std::ostringstream msg;
+                    unsigned long lag = Cudd_ReadElapsedTime(mgr) - Cudd_ReadTimeLimit(mgr);
+                    msg << "Timeout expired.  Lag = " << lag << " ms.";
+                    p->timeoutHandler(msg.str());
+                }
             break;
-	case CUDD_INVALID_ARG:
-	    p->errorHandler("Invalid argument.");
-	    break;
-	case CUDD_INTERNAL_ERROR:
-	    p->errorHandler("Internal error.");
-	    break;
-	case CUDD_NO_ERROR:
-	    p->errorHandler("Unexpected error.");
-	    break;
-	}
+            case CUDD_TERMINATION:
+                {
+                    std::ostringstream msg;
+                    msg << "Terminated.\n";
+                    p->terminationHandler(msg.str());
+                }
+                break;
+            case CUDD_INVALID_ARG:
+                p->errorHandler("Invalid argument.");
+                break;
+            case CUDD_INTERNAL_ERROR:
+                p->errorHandler("Internal error.");
+                break;
+            case CUDD_NO_ERROR:
+                p->errorHandler("Unexpected error.");
+                break;
+        }
     }
 
 } // DD::checkReturnValue
@@ -255,43 +250,42 @@ DD::checkReturnValue(
   int expected) const
 {
     if (result != expected) {
-	DdManager *mgr = p->manager;
-	Cudd_ErrorType errType = Cudd_ReadErrorCode(mgr);
-	switch (errType) {
-	case CUDD_MEMORY_OUT:
-	    p->errorHandler("Out of memory.");
-	    break;
-	case CUDD_TOO_MANY_NODES:
-	    break;
-	case CUDD_MAX_MEM_EXCEEDED:
-	    p->errorHandler("Maximum memory exceeded.");
-	    break;
-        case CUDD_TIMEOUT_EXPIRED:
-            {
-                std::ostringstream msg;
-                unsigned long lag = 
-                    Cudd_ReadElapsedTime(mgr) - Cudd_ReadTimeLimit(mgr);
-                msg << "Timeout expired.  Lag = " << lag << " ms.\n";
-                p->timeoutHandler(msg.str());
-            }
-	    break;
-        case CUDD_TERMINATION:
-            {
-                std::ostringstream msg;
-                msg << "Terminated.\n";
-                p->terminationHandler(msg.str());
-            }
+        DdManager *mgr = p->manager;
+        Cudd_ErrorType errType = Cudd_ReadErrorCode(mgr);
+        switch (errType) {
+            case CUDD_MEMORY_OUT:
+                p->errorHandler("Out of memory.");
+                break;
+            case CUDD_TOO_MANY_NODES:
+                break;
+            case CUDD_MAX_MEM_EXCEEDED:
+                p->errorHandler("Maximum memory exceeded.");
+                break;
+            case CUDD_TIMEOUT_EXPIRED:
+                {
+                    std::ostringstream msg;
+                    unsigned long lag = Cudd_ReadElapsedTime(mgr) - Cudd_ReadTimeLimit(mgr);
+                    msg << "Timeout expired.  Lag = " << lag << " ms.\n";
+                    p->timeoutHandler(msg.str());
+                }
             break;
-	case CUDD_INVALID_ARG:
-	    p->errorHandler("Invalid argument.");
-	    break;
-	case CUDD_INTERNAL_ERROR:
-	    p->errorHandler("Internal error.");
-	    break;
-	case CUDD_NO_ERROR:
-	    p->errorHandler("Unexpected error.");
-	    break;
-	}
+            case CUDD_TERMINATION:
+                {
+                    std::ostringstream msg;
+                    msg << "Terminated.\n";
+                    p->terminationHandler(msg.str());
+                }
+                break;
+            case CUDD_INVALID_ARG:
+                p->errorHandler("Invalid argument.");
+                break;
+            case CUDD_INTERNAL_ERROR:
+                p->errorHandler("Internal error.");
+                break;
+            case CUDD_NO_ERROR:
+                p->errorHandler("Unexpected error.");
+                break;
+        }
     }
 
 } // DD::checkReturnValue
@@ -350,11 +344,10 @@ ABDD::ABDD(const ABDD &from) : DD(from) {}
 
 ABDD::~ABDD() {
     if (node) {
-	Cudd_RecursiveDeref(p->manager,node);
-	if (p->verbose) {
-	    cout << "ADD/BDD destructor called for node " << hex << dec <<
-		node << " ref = " << Cudd_Regular(node)->ref << "\n";
-	}
+        Cudd_RecursiveDeref(p->manager,node);
+        if (p->verbose) {
+            cout << "ADD/BDD destructor called for node " << hex << dec << node << " ref = " << Cudd_Regular(node)->ref << "\n";
+        }
     }
 
 } // ABDD::~ABDD
@@ -432,17 +425,15 @@ BDD::operator=(
     if (this == &right) return *this;
     if (right.node) Cudd_Ref(right.node);
     if (node) {
-	Cudd_RecursiveDeref(p->manager,node);
-	if (p->verbose) {
-	    cout << "BDD dereferencing for node " << hex << node << dec <<
-		" ref = " << Cudd_Regular(node)->ref << "\n";
-	}
+        Cudd_RecursiveDeref(p->manager,node);
+        if (p->verbose) {
+            cout << "BDD dereferencing for node " << hex << node << dec << " ref = " << Cudd_Regular(node)->ref << "\n";
+        }
     }
     node = right.node;
     p = right.p;
     if (node && p->verbose) {
-	cout << "BDD assignment for node " << hex << node << dec <<
-	    " ref = " << Cudd_Regular(node)->ref << "\n";
+        cout << "BDD assignment for node " << hex << node << dec << " ref = " << Cudd_Regular(node)->ref << "\n";
     }
     return *this;
 
@@ -717,7 +708,7 @@ ADD::operator=(
     if (this == &right) return *this;
     if (right.node) Cudd_Ref(right.node);
     if (node) {
-	Cudd_RecursiveDeref(p->manager,node);
+        Cudd_RecursiveDeref(p->manager,node);
     }
     node = right.node;
     p = right.p;
@@ -937,11 +928,10 @@ ZDD::ZDD(const ZDD &from) : DD(from) {}
 
 ZDD::~ZDD() {
     if (node) {
-	Cudd_RecursiveDerefZdd(p->manager,node);
-	if (p->verbose) {
-	    cout << "ZDD destructor called for node " << hex << node << dec <<
-		" ref = " << Cudd_Regular(node)->ref << "\n";
-	}
+        Cudd_RecursiveDerefZdd(p->manager,node);
+        if (p->verbose) {
+            cout << "ZDD destructor called for node " << hex << node << dec << " ref = " << Cudd_Regular(node)->ref << "\n";
+        }
     }
 
 } // ZDD::~ZDD
@@ -954,17 +944,15 @@ ZDD::operator=(
     if (this == &right) return *this;
     if (right.node) Cudd_Ref(right.node);
     if (node) {
-	Cudd_RecursiveDerefZdd(p->manager,node);
-	if (p->verbose) {
-	    cout << "ZDD dereferencing for node " << hex << node << dec <<
-		" ref = " << node->ref << "\n";
-	}
+        Cudd_RecursiveDerefZdd(p->manager,node);
+        if (p->verbose) {
+            cout << "ZDD dereferencing for node " << hex << node << dec << " ref = " << node->ref << "\n";
+        }
     }
     node = right.node;
     p = right.p;
     if (node && p->verbose) {
-	cout << "ZDD assignment for node " << hex << node << dec <<
-	    " ref = " << node->ref << "\n";
+        cout << "ZDD assignment for node " << hex << node << dec << " ref = " << node->ref << "\n";
     }
     return *this;
 
@@ -1016,8 +1004,7 @@ ZDD::operator<(
   const ZDD& other) const
 {
     DdManager *mgr = checkSameManager(other);
-    return node != other.node &&
-	Cudd_zddDiffConst(mgr,node,other.node) == Cudd_ReadZero(mgr);
+    return node != other.node && Cudd_zddDiffConst(mgr,node,other.node) == Cudd_ReadZero(mgr);
 
 } // ZDD::operator<
 
@@ -1027,8 +1014,7 @@ ZDD::operator>(
   const ZDD& other) const
 {
     DdManager *mgr = checkSameManager(other);
-    return node != other.node &&
-	Cudd_zddDiffConst(mgr,other.node,node) == Cudd_ReadZero(mgr);
+    return node != other.node && Cudd_zddDiffConst(mgr,other.node,node) == Cudd_ReadZero(mgr);
 
 } // ZDD::operator>
 
@@ -1204,8 +1190,7 @@ Cudd::Cudd(
 {
     p = x.p;
     x.p->ref++;
-    if (p->verbose)
-        cout << "Cudd Copy Constructor" << endl;
+    if (p->verbose) cout << "Cudd Copy Constructor" << endl;
 
 } // Cudd::Cudd
 
@@ -1213,7 +1198,7 @@ Cudd::Cudd(
 Cudd::~Cudd()
 {
     if (--p->ref == 0) {
-	delete p;
+        delete p;
     }
 
 } // Cudd::~Cudd
@@ -1256,8 +1241,8 @@ Cudd::operator=(
   const Cudd& right)
 {
     right.p->ref++;
-    if (--p->ref == 0) {	// disconnect self
-	delete p;
+    if (--p->ref == 0) { // disconnect self
+        delete p;
     }
     p = right.p;
     return *this;
@@ -1354,8 +1339,8 @@ Cudd::checkReturnValue(
   const void *result) const
 {
     if (result == 0) {
-	if (Cudd_ReadErrorCode(p->manager) == CUDD_MEMORY_OUT) {
-	    p->errorHandler("Out of memory.");
+        if (Cudd_ReadErrorCode(p->manager) == CUDD_MEMORY_OUT) {
+            p->errorHandler("Out of memory.");
         } else if (Cudd_ReadErrorCode(p->manager) == CUDD_TOO_MANY_NODES) {
             p->errorHandler("Too many nodes.");
         } else if (Cudd_ReadErrorCode(p->manager) == CUDD_MAX_MEM_EXCEEDED) {
@@ -1363,7 +1348,7 @@ Cudd::checkReturnValue(
         } else if (Cudd_ReadErrorCode(p->manager) == CUDD_TIMEOUT_EXPIRED) {
             std::ostringstream msg;
             DdManager *mgr = p->manager;
-            unsigned long lag = 
+            unsigned long lag =
                 Cudd_ReadElapsedTime(mgr) - Cudd_ReadTimeLimit(mgr);
             msg << "Timeout expired.  Lag = " << lag << " ms.\n";
             p->timeoutHandler(msg.str());
@@ -1373,9 +1358,9 @@ Cudd::checkReturnValue(
             p->terminationHandler(msg.str());
         } else if (Cudd_ReadErrorCode(p->manager) == CUDD_INVALID_ARG) {
             p->errorHandler("Invalid argument.");
-	} else if (Cudd_ReadErrorCode(p->manager) == CUDD_INTERNAL_ERROR) {
-	    p->errorHandler("Internal error.");
-	} else {
+        } else if (Cudd_ReadErrorCode(p->manager) == CUDD_INTERNAL_ERROR) {
+            p->errorHandler("Internal error.");
+        } else {
             p->errorHandler("Unexpected error.");
         }
     }
@@ -1388,8 +1373,8 @@ Cudd::checkReturnValue(
   const int result) const
 {
     if (result == 0) {
-	if (Cudd_ReadErrorCode(p->manager) == CUDD_MEMORY_OUT) {
-	    p->errorHandler("Out of memory.");
+        if (Cudd_ReadErrorCode(p->manager) == CUDD_MEMORY_OUT) {
+            p->errorHandler("Out of memory.");
         } else if (Cudd_ReadErrorCode(p->manager) == CUDD_TOO_MANY_NODES) {
             p->errorHandler("Too many nodes.");
         } else if (Cudd_ReadErrorCode(p->manager) == CUDD_MAX_MEM_EXCEEDED) {
@@ -1397,8 +1382,7 @@ Cudd::checkReturnValue(
         } else if (Cudd_ReadErrorCode(p->manager) == CUDD_TIMEOUT_EXPIRED) {
             std::ostringstream msg;
             DdManager *mgr = p->manager;
-            unsigned long lag = 
-                Cudd_ReadElapsedTime(mgr) - Cudd_ReadTimeLimit(mgr);
+            unsigned long lag = Cudd_ReadElapsedTime(mgr) - Cudd_ReadTimeLimit(mgr);
             msg << "Timeout expired.  Lag = " << lag << " ms.\n";
             p->timeoutHandler(msg.str());
         } else if (Cudd_ReadErrorCode(p->manager) == CUDD_TERMINATION) {
@@ -1407,11 +1391,11 @@ Cudd::checkReturnValue(
             p->terminationHandler(msg.str());
         } else if (Cudd_ReadErrorCode(p->manager) == CUDD_INVALID_ARG) {
             p->errorHandler("Invalid argument.");
-	} else if (Cudd_ReadErrorCode(p->manager) == CUDD_INTERNAL_ERROR) {
-	    p->errorHandler("Internal error.");
-	} else {
-	    p->errorHandler("Unexpected error.");
-	}
+        } else if (Cudd_ReadErrorCode(p->manager) == CUDD_INTERNAL_ERROR) {
+            p->errorHandler("Internal error.");
+        } else {
+            p->errorHandler("Unexpected error.");
+        }
     }
 
 } // Cudd::checkReturnValue
@@ -1634,7 +1618,7 @@ Cudd::ReadElapsedTime() const
 } // Cudd::ReadElapsedTime
 
 
-void 
+void
 Cudd::SetStartTime(
   unsigned long st) const
 {
@@ -1643,7 +1627,7 @@ Cudd::SetStartTime(
 } // Cudd::SetStartTime
 
 
-void 
+void
 Cudd::ResetStartTime() const
 {
     Cudd_ResetStartTime(p->manager);
@@ -1685,7 +1669,7 @@ Cudd::IncreaseTimeLimit(
 } // Cudd::IncreaseTimeLimit
 
 
-void 
+void
 Cudd::UnsetTimeLimit() const
 {
     Cudd_UnsetTimeLimit(p->manager);
@@ -1852,7 +1836,7 @@ Cudd::SetBackground(
 {
     DdManager *mgr = p->manager;
     if (mgr != bg.manager()) {
-	p->errorHandler("Background comes from different manager.");
+        p->errorHandler("Background comes from different manager.");
     }
     Cudd_SetBackground(mgr, bg.getNode());
 
@@ -2360,7 +2344,7 @@ Cudd::SetNumberXovers(
 } // Cudd::SetNumberXovers
 
 
-unsigned int 
+unsigned int
 Cudd::ReadOrderRandomization() const
 {
     return Cudd_ReadOrderRandomization(p->manager);
@@ -2368,7 +2352,7 @@ Cudd::ReadOrderRandomization() const
 } // Cudd::ReadOrderRandomization
 
 
-void 
+void
 Cudd::SetOrderRandomization(
   unsigned int factor) const
 {
@@ -2981,8 +2965,8 @@ Cudd::Walsh(
     DdNode **X = new DdNode *[n];
     DdNode **Y = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	X[i] = x[i].getNode();
-	Y[i] = y[i].getNode();
+        X[i] = x[i].getNode();
+        Y[i] = y[i].getNode();
     }
     DdNode *result = Cudd_addWalsh(p->manager, X, Y, (int) n);
     delete [] X;
@@ -3016,11 +3000,8 @@ BDD::AndAbstract(
     DdManager *mgr = checkSameManager(g);
     checkSameManager(cube);
     DdNode *result;
-    if (limit == 0)
-	result = Cudd_bddAndAbstract(mgr, node, g.node, cube.node);
-    else
-	result = Cudd_bddAndAbstractLimit(mgr, node, g.node,
-					  cube.node, limit);
+    if (limit == 0) result = Cudd_bddAndAbstract(mgr, node, g.node, cube.node);
+    else result = Cudd_bddAndAbstractLimit(mgr, node, g.node, cube.node, limit);
     checkReturnValue(result);
     return BDD(p, result);
 
@@ -3315,7 +3296,7 @@ BDD::BiasedUnderApprox(
   double quality0) const
 {
     DdManager *mgr = p->manager;
-    DdNode *result = Cudd_BiasedUnderApprox(mgr, node, bias.node, numVars, 
+    DdNode *result = Cudd_BiasedUnderApprox(mgr, node, bias.node, numVars,
                                             threshold, quality1, quality0);
     checkReturnValue(result);
     return BDD(p, result);
@@ -3332,7 +3313,7 @@ BDD::BiasedOverApprox(
   double quality0) const
 {
     DdManager *mgr = p->manager;
-    DdNode *result = Cudd_BiasedOverApprox(mgr, node, bias.node, numVars, 
+    DdNode *result = Cudd_BiasedOverApprox(mgr, node, bias.node, numVars,
                                            threshold, quality1, quality0);
     checkReturnValue(result);
     return BDD(p, result);
@@ -3347,10 +3328,8 @@ BDD::ExistAbstract(
 {
     DdManager *mgr = checkSameManager(cube);
     DdNode *result;
-    if (limit == 0)
-        result = Cudd_bddExistAbstract(mgr, node, cube.node);
-    else
-        result = Cudd_bddExistAbstractLimit(mgr, node, cube.node, limit);
+    if (limit == 0) result = Cudd_bddExistAbstract(mgr, node, cube.node);
+    else result = Cudd_bddExistAbstractLimit(mgr, node, cube.node, limit);
     checkReturnValue(result);
     return BDD(p, result);
 
@@ -3435,10 +3414,8 @@ BDD::Ite(
     DdManager *mgr = checkSameManager(g);
     checkSameManager(h);
     DdNode *result;
-    if (limit == 0)
-	result = Cudd_bddIte(mgr, node, g.node, h.node);
-    else
-	result = Cudd_bddIteLimit(mgr, node, g.node, h.node, limit);
+    if (limit == 0) result = Cudd_bddIte(mgr, node, g.node, h.node);
+    else result = Cudd_bddIteLimit(mgr, node, g.node, h.node, limit);
     checkReturnValue(result);
     return BDD(p, result);
 
@@ -3478,10 +3455,8 @@ BDD::And(
 {
     DdManager *mgr = checkSameManager(g);
     DdNode *result;
-    if (limit == 0)
-	result = Cudd_bddAnd(mgr, node, g.node);
-    else
-	result = Cudd_bddAndLimit(mgr, node, g.node, limit);
+    if (limit == 0) result = Cudd_bddAnd(mgr, node, g.node);
+    else result = Cudd_bddAndLimit(mgr, node, g.node, limit);
     checkReturnValue(result);
     return BDD(p, result);
 
@@ -3495,10 +3470,8 @@ BDD::Or(
 {
     DdManager *mgr = checkSameManager(g);
     DdNode *result;
-    if (limit == 0)
-	result = Cudd_bddOr(mgr, node, g.node);
-    else
-	result = Cudd_bddOrLimit(mgr, node, g.node, limit);
+    if (limit == 0) result = Cudd_bddOr(mgr, node, g.node);
+    else result = Cudd_bddOrLimit(mgr, node, g.node, limit);
     checkReturnValue(result);
     return BDD(p, result);
 
@@ -3548,10 +3521,8 @@ BDD::Xnor(
 {
     DdManager *mgr = checkSameManager(g);
     DdNode *result;
-    if (limit == 0)
-	result = Cudd_bddXnor(mgr, node, g.node);
-    else
-	result = Cudd_bddXnorLimit(mgr, node, g.node, limit);
+    if (limit == 0) result = Cudd_bddXnor(mgr, node, g.node);
+    else result = Cudd_bddXnorLimit(mgr, node, g.node, limit);
     checkReturnValue(result);
     return BDD(p, result);
 
@@ -3676,8 +3647,7 @@ BDD::ClippingAnd(
   int direction) const
 {
     DdManager *mgr = checkSameManager(g);
-    DdNode *result = Cudd_bddClippingAnd(mgr, node, g.node, maxDepth,
-					 direction);
+    DdNode *result = Cudd_bddClippingAnd(mgr, node, g.node, maxDepth, direction);
     checkReturnValue(result);
     return BDD(p, result);
 
@@ -3693,8 +3663,7 @@ BDD::ClippingAndAbstract(
 {
     DdManager *mgr = checkSameManager(g);
     checkSameManager(cube);
-    DdNode *result = Cudd_bddClippingAndAbstract(mgr, node, g.node, cube.node,
-						 maxDepth, direction);
+    DdNode *result = Cudd_bddClippingAndAbstract(mgr, node, g.node, cube.node, maxDepth, direction);
     checkReturnValue(result);
     return BDD(p, result);
 
@@ -3780,8 +3749,8 @@ ADD::SwapVariables(
     DdNode **X = new DdNode *[n];
     DdNode **Y = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	X[i] = x[i].node;
-	Y[i] = y[i].node;
+        X[i] = x[i].node;
+        Y[i] = y[i].node;
     }
     DdNode *result = Cudd_addSwapVariables(mgr, node, X, Y, (int) n);
     delete [] X;
@@ -3834,7 +3803,7 @@ BDD::AdjPermuteX(
     DdManager *mgr = p->manager;
     DdNode **X = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	X[i] = x[i].node;
+        X[i] = x[i].node;
     }
     DdNode *result = Cudd_bddAdjPermuteX(mgr, node, X, (int) n);
     delete [] X;
@@ -3852,7 +3821,7 @@ ADD::VectorCompose(
     size_t n = (size_t) Cudd_ReadSize(mgr);
     DdNode **X = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	X[i] = vect[i].node;
+        X[i] = vect[i].node;
     }
     DdNode *result = Cudd_addVectorCompose(mgr, node, X);
     delete [] X;
@@ -3870,7 +3839,7 @@ ADD::NonSimCompose(
     size_t n = (size_t) Cudd_ReadSize(mgr);
     DdNode **X = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	X[i] = vect[i].node;
+        X[i] = vect[i].node;
     }
     DdNode *result = Cudd_addNonSimCompose(mgr, node, X);
     delete [] X;
@@ -3888,7 +3857,7 @@ BDD::VectorCompose(
     size_t n = (size_t) Cudd_ReadSize(mgr);
     DdNode **X = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	X[i] = vect[i].node;
+        X[i] = vect[i].node;
     }
     DdNode *result = Cudd_bddVectorCompose(mgr, node, X);
     delete [] X;
@@ -4098,7 +4067,7 @@ Cudd::DumpBlif(
     size_t n = nodes.size();
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i ++) {
-	F[i] = nodes[i].getNode();
+        F[i] = nodes[i].getNode();
     }
     int result = Cudd_DumpBlif(mgr, (int) n, F, inames, onames, mname, fp, mv);
     delete [] F;
@@ -4118,7 +4087,7 @@ Cudd::DumpDot(
     size_t n = nodes.size();
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i ++) {
-	F[i] = nodes[i].getNode();
+        F[i] = nodes[i].getNode();
     }
     int result = Cudd_DumpDot(mgr, (int) n, F, inames, onames, fp);
     delete [] F;
@@ -4138,7 +4107,7 @@ Cudd::DumpDot(
     size_t n = nodes.size();
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i ++) {
-	F[i] = nodes[i].getNode();
+        F[i] = nodes[i].getNode();
     }
     int result = Cudd_DumpDot(mgr, (int) n, F, inames, onames, fp);
     delete [] F;
@@ -4158,7 +4127,7 @@ Cudd::DumpDaVinci(
     size_t n = nodes.size();
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i ++) {
-	F[i] = nodes[i].getNode();
+        F[i] = nodes[i].getNode();
     }
     int result = Cudd_DumpDaVinci(mgr, (int) n, F, inames, onames, fp);
     delete [] F;
@@ -4178,7 +4147,7 @@ Cudd::DumpDaVinci(
     size_t n = nodes.size();
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i ++) {
-	F[i] = nodes[i].getNode();
+        F[i] = nodes[i].getNode();
     }
     int result = Cudd_DumpDaVinci(mgr, (int) n, F, inames, onames, fp);
     delete [] F;
@@ -4198,7 +4167,7 @@ Cudd::DumpDDcal(
     size_t n = nodes.size();
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i ++) {
-	F[i] = nodes[i].getNode();
+        F[i] = nodes[i].getNode();
     }
     int result = Cudd_DumpDDcal(mgr, (int) n, F, inames, onames, fp);
     delete [] F;
@@ -4218,7 +4187,7 @@ Cudd::DumpFactoredForm(
     size_t n = nodes.size();
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i ++) {
-	F[i] = nodes[i].getNode();
+        F[i] = nodes[i].getNode();
     }
     int result = Cudd_DumpFactoredForm(mgr, (int) n, F, inames, onames, fp);
     delete [] F;
@@ -4311,8 +4280,8 @@ BDD::ConstrainDecomp() const
     int size = Cudd_ReadSize(mgr);
     vector<BDD> vect;
     for (int i = 0; i < size; i++) {
-	Cudd_Deref(result[i]);
-	vect.push_back(BDD(p, result[i]));
+        Cudd_Deref(result[i]);
+        vect.push_back(BDD(p, result[i]));
     }
     free(result);
     return vect;
@@ -4341,8 +4310,8 @@ BDD::CharToVect() const
     int size = Cudd_ReadSize(mgr);
     vector<BDD> vect;
     for (int i = 0; i < size; i++) {
-	Cudd_Deref(result[i]);
-	vect.push_back(BDD(p, result[i]));
+        Cudd_Deref(result[i]);
+        vect.push_back(BDD(p, result[i]));
     }
     free(result);
     return vect;
@@ -4550,7 +4519,7 @@ ADD::MatrixMultiply(
     DdManager *mgr = checkSameManager(B);
     DdNode **Z = new DdNode *[nz];
     for (size_t i = 0; i < nz; i++) {
-	Z[i] = z[i].node;
+        Z[i] = z[i].node;
     }
     DdNode *result = Cudd_addMatrixMultiply(mgr, node, B.node, Z, (int) nz);
     delete [] Z;
@@ -4569,7 +4538,7 @@ ADD::TimesPlus(
     DdManager *mgr = checkSameManager(B);
     DdNode **Z = new DdNode *[nz];
     for (size_t i = 0; i < nz; i++) {
-	Z[i] = z[i].node;
+        Z[i] = z[i].node;
     }
     DdNode *result = Cudd_addTimesPlus(mgr, node, B.node, Z, (int) nz);
     delete [] Z;
@@ -4588,7 +4557,7 @@ ADD::Triangle(
     DdManager *mgr = checkSameManager(g);
     DdNode **Z = new DdNode *[nz];
     for (size_t i = 0; i < nz; i++) {
-	Z[i] = z[i].node;
+        Z[i] = z[i].node;
     }
     DdNode *result = Cudd_addTriangle(mgr, node, g.node, Z, (int) nz);
     delete [] Z;
@@ -4612,9 +4581,9 @@ BDD::PrioritySelect(
     DdNode **Y = new DdNode *[n];
     DdNode **Z = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	X[i] = x[i].node;
-	Y[i] = y[i].node;
-	Z[i] = z[i].node;
+        X[i] = x[i].node;
+        Y[i] = y[i].node;
+        Z[i] = z[i].node;
     }
     DdNode *result = Cudd_PrioritySelect(mgr, node, X, Y, Z, Pi.node,
                                          (int) n, Pifunc);
@@ -4639,9 +4608,9 @@ Cudd::Xgty(
     DdNode **Y = new DdNode *[N];
     DdNode **Z = new DdNode *[N];
     for (size_t i = 0; i < N; i++) {
-	X[i] = x[i].getNode();
-	Y[i] = y[i].getNode();
-	Z[i] = z[i].getNode();
+        X[i] = x[i].getNode();
+        Y[i] = y[i].getNode();
+        Z[i] = z[i].getNode();
     }
     DdNode *result = Cudd_Xgty(mgr, (int) N, Z, X, Y);
     delete [] X;
@@ -4663,8 +4632,8 @@ Cudd::Xeqy(
     DdNode **X = new DdNode *[N];
     DdNode **Y = new DdNode *[N];
     for (size_t i = 0; i < N; i++) {
-	X[i] = x[i].getNode();
-	Y[i] = y[i].getNode();
+        X[i] = x[i].getNode();
+        Y[i] = y[i].getNode();
     }
     DdNode *result = Cudd_Xeqy(mgr, (int) N, X, Y);
     delete [] X;
@@ -4685,8 +4654,8 @@ Cudd::Xeqy(
     DdNode **X = new DdNode *[N];
     DdNode **Y = new DdNode *[N];
     for (size_t i = 0; i < N; i++) {
-	X[i] = x[i].getNode();
-	Y[i] = y[i].getNode();
+        X[i] = x[i].getNode();
+        Y[i] = y[i].getNode();
     }
     DdNode *result = Cudd_addXeqy(mgr, (int) N, X, X);
     delete [] X;
@@ -4709,9 +4678,9 @@ Cudd::Dxygtdxz(
     DdNode **Y = new DdNode *[N];
     DdNode **Z = new DdNode *[N];
     for (size_t i = 0; i < N; i++) {
-	X[i] = x[i].getNode();
-	Y[i] = y[i].getNode();
-	Z[i] = z[i].getNode();
+        X[i] = x[i].getNode();
+        Y[i] = y[i].getNode();
+        Z[i] = z[i].getNode();
     }
     DdNode *result = Cudd_Dxygtdxz(mgr, (int) N, X, Y, Z);
     delete [] X;
@@ -4735,9 +4704,9 @@ Cudd::Dxygtdyz(
     DdNode **Y = new DdNode *[N];
     DdNode **Z = new DdNode *[N];
     for (size_t i = 0; i < N; i++) {
-	X[i] = x[i].getNode();
-	Y[i] = y[i].getNode();
-	Z[i] = z[i].getNode();
+        X[i] = x[i].getNode();
+        Y[i] = y[i].getNode();
+        Z[i] = z[i].getNode();
     }
     DdNode *result = Cudd_Dxygtdyz(mgr, (int) N, X, Y, Z);
     delete [] X;
@@ -4760,8 +4729,8 @@ Cudd::Inequality(
     DdNode **X = new DdNode *[N];
     DdNode **Y = new DdNode *[N];
     for (size_t i = 0; i < N; i++) {
-	X[i] = x[i].getNode();
-	Y[i] = y[i].getNode();
+        X[i] = x[i].getNode();
+        Y[i] = y[i].getNode();
     }
     DdNode *result = Cudd_Inequality(mgr, (int) N, c, X, Y);
     delete [] X;
@@ -4783,8 +4752,8 @@ Cudd::Disequality(
     DdNode **X = new DdNode *[N];
     DdNode **Y = new DdNode *[N];
     for (size_t i = 0; i < N; i++) {
-	X[i] = x[i].getNode();
-	Y[i] = y[i].getNode();
+        X[i] = x[i].getNode();
+        Y[i] = y[i].getNode();
     }
     DdNode *result = Cudd_Disequality(mgr, (int) N, c, X, Y);
     delete [] X;
@@ -4805,7 +4774,7 @@ Cudd::Interval(
     DdManager *mgr = p->manager;
     DdNode **X = new DdNode *[N];
     for (size_t i = 0; i < N; i++) {
-	X[i] = x[i].getNode();
+        X[i] = x[i].getNode();
     }
     DdNode *result = Cudd_bddInterval(mgr, (int) N, X, lowerB, upperB);
     delete [] X;
@@ -4849,8 +4818,8 @@ Cudd::Hamming(
     DdNode **X = new DdNode *[nVars];
     DdNode **Y = new DdNode *[nVars];
     for (size_t i = 0; i < nVars; i++) {
-	X[i] = xVars[i].getNode();
-	Y[i] = yVars[i].getNode();
+        X[i] = xVars[i].getNode();
+        Y[i] = yVars[i].getNode();
     }
     DdNode *result = Cudd_addHamming(mgr, X, Y, (int) nVars);
     delete [] X;
@@ -5194,7 +5163,7 @@ BDD::SolveEqn(
     checkReturnValue(result);
     for (int i = 0; i < n; i++) {
         G.push_back(BDD(p, g[i]));
-	Cudd_RecursiveDeref(mgr,g[i]);
+        Cudd_RecursiveDeref(mgr,g[i]);
     }
     delete [] g;
     return BDD(p, result);
@@ -5211,7 +5180,7 @@ BDD::VerifySol(
     DdManager *mgr = p->manager;
     DdNode **g = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	g[i] = G[i].node;
+        g[i] = G[i].node;
     }
     DdNode *result = Cudd_VerifySol(mgr, node, g, yIndex, (int) n);
     delete [] g;
@@ -5230,7 +5199,7 @@ BDD::SplitSet(
     DdManager *mgr = p->manager;
     DdNode **X = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	X[i] = xVars[i].node;
+        X[i] = xVars[i].node;
     }
     DdNode *result = Cudd_SplitSet(mgr, node, X, (int) n, m);
     delete [] X;
@@ -5388,7 +5357,7 @@ Cudd::SharingSize(
 {
     DdNode **nodeArray = new DdNode *[n];
     for (int i = 0; i < n; i++) {
-	nodeArray[i] = nodes[i].getNode();
+        nodeArray[i] = nodes[i].getNode();
     }
     int result = Cudd_SharingSize(nodeArray, n);
     delete [] nodeArray;
@@ -5405,7 +5374,7 @@ Cudd::SharingSize(
     vector<BDD>::size_type n = v.size();
     DdNode **nodeArray = new DdNode *[n];
     for (vector<BDD>::size_type i = 0; i != n; ++i) {
-	nodeArray[i] = v[i].getNode();
+        nodeArray[i] = v[i].getNode();
     }
     int result = Cudd_SharingSize(nodeArray, (int) n);
     delete [] nodeArray;
@@ -5466,7 +5435,7 @@ Cudd::VectorSupport(const std::vector<BDD>& roots) const
     DdManager *mgr = p->manager;
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	F[i] = roots[i].getNode();
+        F[i] = roots[i].getNode();
     }
     DdNode *result = Cudd_VectorSupport(mgr, F, (int) n);
     delete [] F;
@@ -5499,7 +5468,7 @@ Cudd::SupportIndices(const std::vector<BDD>& roots) const
     DdManager *mgr = p->manager;
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	F[i] = roots[i].getNode();
+        F[i] = roots[i].getNode();
     }
     int size = Cudd_VectorSupportIndices(mgr, F, (int) n, (int **)&support);
     delete [] F;
@@ -5520,7 +5489,7 @@ Cudd::SupportIndices(const std::vector<ADD>& roots) const
     DdManager *mgr = p->manager;
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	F[i] = roots[i].getNode();
+        F[i] = roots[i].getNode();
     }
     int size = Cudd_VectorSupportIndices(mgr, F, (int) n, (int **)&support);
     delete [] F;
@@ -5539,7 +5508,7 @@ Cudd::nodeCount(const std::vector<BDD>& roots) const
     size_t n = roots.size();
     DdNode **nodeArray = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	nodeArray[i] = roots[i].getNode();
+        nodeArray[i] = roots[i].getNode();
     }
     int result = Cudd_SharingSize(nodeArray, (int) n);
     delete [] nodeArray;
@@ -5556,7 +5525,7 @@ Cudd::VectorSupport(const std::vector<ADD>& roots) const
     DdManager *mgr = p->manager;
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	F[i] = roots[i].getNode();
+        F[i] = roots[i].getNode();
     }
     DdNode *result = Cudd_VectorSupport(mgr, F, (int) n);
     delete [] F;
@@ -5573,7 +5542,7 @@ Cudd::VectorSupportSize(const std::vector<BDD>& roots) const
     DdManager *mgr = p->manager;
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	F[i] = roots[i].getNode();
+        F[i] = roots[i].getNode();
     }
     int result = Cudd_VectorSupportSize(mgr, F, (int) n);
     delete [] F;
@@ -5590,7 +5559,7 @@ Cudd::VectorSupportSize(const std::vector<ADD>& roots) const
     DdManager *mgr = p->manager;
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	F[i] = roots[i].getNode();
+        F[i] = roots[i].getNode();
     }
     int result = Cudd_VectorSupportSize(mgr, F, (int) n);
     delete [] F;
@@ -5645,7 +5614,7 @@ BDD::PickOneMinterm(
     DdManager *mgr = p->manager;
     DdNode **V = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	V[i] = vars[i].node;
+        V[i] = vars[i].node;
     }
     DdNode *result = Cudd_bddPickOneMinterm(mgr, node, V, (int) n);
     delete [] V;
@@ -5664,7 +5633,7 @@ Cudd::bddComputeCube(
     DdManager *mgr = p->manager;
     DdNode **V = new DdNode *[n];
     for (int i = 0; i < n; i++) {
-	V[i] = vars[i].getNode();
+        V[i] = vars[i].getNode();
     }
     DdNode *result = Cudd_bddComputeCube(mgr, V, phase, n);
     delete [] V;
@@ -5682,7 +5651,7 @@ Cudd::computeCube(
     size_t n = vars.size();
     DdNode **V = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	V[i] = vars[i].getNode();
+        V[i] = vars[i].getNode();
     }
     DdNode *result = Cudd_bddComputeCube(mgr, V, 0, n);
     delete [] V;
@@ -5701,7 +5670,7 @@ Cudd::addComputeCube(
     DdManager *mgr = p->manager;
     DdNode **V = new DdNode *[n];
     for (int i = 0; i < n; i++) {
-	V[i] = vars[i].getNode();
+        V[i] = vars[i].getNode();
     }
     DdNode *result = Cudd_addComputeCube(mgr, V, phase, n);
     delete [] V;
@@ -5719,7 +5688,7 @@ Cudd::computeCube(
     size_t n = vars.size();
     DdNode **V = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	V[i] = vars[i].getNode();
+        V[i] = vars[i].getNode();
     }
     DdNode *result = Cudd_addComputeCube(mgr, V, 0, n);
     delete [] V;
@@ -6136,7 +6105,7 @@ Cudd::DumpDot(
     size_t n = nodes.size();
     DdNode **F = new DdNode *[n];
     for (size_t i = 0; i < n; i++) {
-	F[i] = nodes[i].getNode();
+        F[i] = nodes[i].getNode();
     }
     int result = Cudd_zddDumpDot(mgr, (int) n, F, inames, onames, fp);
     delete [] F;

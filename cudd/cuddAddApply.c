@@ -164,8 +164,6 @@ Cudd_addPlus(
 
   @see Cudd_addApply
 
-  @author Vu Phan (https://vuphan314.github.io/)
-
 */
 DdNode *
 Cudd_addLogSumExp(
