@@ -321,6 +321,7 @@ public:
     ADD UnivAbstract(const ADD& cube) const;
     ADD OrAbstract(const ADD& cube) const;
     ADD Plus(const ADD& g) const;
+    ADD LogSumExp(const ADD& g) const;
     ADD Times(const ADD& g) const;
     ADD Threshold(const ADD& g) const;
     ADD SetNZ(const ADD& g) const;

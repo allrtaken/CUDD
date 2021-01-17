@@ -2636,6 +2636,18 @@ ADD::Plus(
 
 
 ADD
+ADD::LogSumExp(
+  const ADD& g) const
+{
+    DdManager *mgr = checkSameManager(g);
+    DdNode *result = Cudd_addApply(mgr, Cudd_addLogSumExp, node, g.node);
+    checkReturnValue(result);
+    return ADD(p, result);
+
+} // ADD::LogSumExp
+
+
+ADD
 ADD::Times(
   const ADD& g) const
 {
