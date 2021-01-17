@@ -106,8 +106,8 @@ Cudd_addApply(
     DdNode *res;
 
     do {
-	dd->reordered = 0;
-	res = cuddAddApplyRecur(dd,op,f,g);
+        dd->reordered = 0;
+        res = cuddAddApplyRecur(dd,op,f,g);
     } while (dd->reordered == 1);
     if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
         dd->timeoutHandler(dd, dd->tohArg);
@@ -142,13 +142,13 @@ Cudd_addPlus(
     if (F == DD_ZERO(dd)) return(G);
     if (G == DD_ZERO(dd)) return(F);
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
-	value = cuddV(F)+cuddV(G);
-	res = cuddUniqueConst(dd,value);
-	return(res);
+        value = cuddV(F)+cuddV(G);
+        res = cuddUniqueConst(dd,value);
+        return(res);
     }
     if (F > G) { /* swap f and g */
-	*f = G;
-	*g = F;
+        *f = G;
+        *g = F;
     }
     return(NULL);
 
@@ -183,13 +183,13 @@ Cudd_addTimes(
     if (F == DD_ONE(dd)) return(G);
     if (G == DD_ONE(dd)) return(F);
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
-	value = cuddV(F)*cuddV(G);
-	res = cuddUniqueConst(dd,value);
-	return(res);
+        value = cuddV(F)*cuddV(G);
+        res = cuddUniqueConst(dd,value);
+        return(res);
     }
     if (F > G) { /* swap f and g */
-	*f = G;
-	*g = F;
+        *f = G;
+        *g = F;
     }
     return(NULL);
 
@@ -219,11 +219,11 @@ Cudd_addThreshold(
     F = *f; G = *g;
     if (F == G || F == DD_PLUS_INFINITY(dd)) return(F);
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
-	if (cuddV(F) >= cuddV(G)) {
-	    return(F);
-	} else {
-	    return(DD_ZERO(dd));
-	}
+        if (cuddV(F) >= cuddV(G)) {
+            return(F);
+        } else {
+            return(DD_ZERO(dd));
+        }
     }
     return(NULL);
 
@@ -284,9 +284,9 @@ Cudd_addDivide(
     if (F == DD_ZERO(dd)) return(DD_ZERO(dd));
     if (G == DD_ONE(dd)) return(F);
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
-	value = cuddV(F)/cuddV(G);
-	res = cuddUniqueConst(dd,value);
-	return(res);
+        value = cuddV(F)/cuddV(G);
+        res = cuddUniqueConst(dd,value);
+        return(res);
     }
     return(NULL);
 
@@ -318,9 +318,9 @@ Cudd_addMinus(
     if (F == DD_ZERO(dd)) return(cuddAddNegateRecur(dd,G));
     if (G == DD_ZERO(dd)) return(F);
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
-	value = cuddV(F)-cuddV(G);
-	res = cuddUniqueConst(dd,value);
-	return(res);
+        value = cuddV(F)-cuddV(G);
+        res = cuddUniqueConst(dd,value);
+        return(res);
     }
     return(NULL);
 
@@ -331,7 +331,7 @@ Cudd_addMinus(
   @brief Integer and floating point min.
 
   @details Integer and floating point min for Cudd_addApply.
-  
+
   @return NULL if not a terminal case; min(f,g) otherwise.
 
   @sideeffect None
@@ -357,15 +357,15 @@ Cudd_addMinimum(
     if (G == DD_MINUS_INFINITY(dd)) return(G);
 #endif
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
-	if (cuddV(F) <= cuddV(G)) {
-	    return(F);
-	} else {
-	    return(G);
-	}
+        if (cuddV(F) <= cuddV(G)) {
+            return(F);
+        } else {
+            return(G);
+        }
     }
     if (F > G) { /* swap f and g */
-	*f = G;
-	*g = F;
+        *f = G;
+        *g = F;
     }
     return(NULL);
 
@@ -402,15 +402,15 @@ Cudd_addMaximum(
     if (G == DD_PLUS_INFINITY(dd)) return(G);
 #endif
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
-	if (cuddV(F) >= cuddV(G)) {
-	    return(F);
-	} else {
-	    return(G);
-	}
+        if (cuddV(F) >= cuddV(G)) {
+            return(F);
+        } else {
+            return(G);
+        }
     }
     if (F > G) { /* swap f and g */
-	*f = G;
-	*g = F;
+        *f = G;
+        *g = F;
     }
     return(NULL);
 
@@ -438,13 +438,13 @@ Cudd_addOneZeroMaximum(
 
     if (*f == *g) return(DD_ZERO(dd));
     if (*g == DD_PLUS_INFINITY(dd))
-	return DD_ZERO(dd);
+        return DD_ZERO(dd);
     if (cuddIsConstant(*f) && cuddIsConstant(*g)) {
-	if (cuddV(*f) > cuddV(*g)) {
-	    return(DD_ONE(dd));
-	} else {
-	    return(DD_ZERO(dd));
-	}
+        if (cuddV(*f) > cuddV(*g)) {
+            return(DD_ONE(dd));
+        } else {
+            return(DD_ZERO(dd));
+        }
     }
 
     return(NULL);
@@ -476,15 +476,15 @@ Cudd_addDiff(
     if (F == DD_PLUS_INFINITY(dd)) return(G);
     if (G == DD_PLUS_INFINITY(dd)) return(F);
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
-	if (cuddV(F) != cuddV(G)) {
-	    if (cuddV(F) < cuddV(G)) {
-		return(F);
-	    } else {
-		return(G);
-	    }
-	} else {
-	    return(DD_PLUS_INFINITY(dd));
-	}
+        if (cuddV(F) != cuddV(G)) {
+            if (cuddV(F) < cuddV(G)) {
+                return(F);
+            } else {
+                return(G);
+            }
+        } else {
+            return(DD_PLUS_INFINITY(dd));
+        }
     }
     return(NULL);
 
@@ -544,8 +544,8 @@ Cudd_addOr(
     if (cuddIsConstant(G)) return(F);
     if (F == G) return(F);
     if (F > G) { /* swap f and g */
-	*f = G;
-	*g = F;
+        *f = G;
+        *g = F;
     }
     return(NULL);
 
@@ -574,8 +574,8 @@ Cudd_addNand(
     if (F == DD_ZERO(dd) || G == DD_ZERO(dd)) return(DD_ONE(dd));
     if (cuddIsConstant(F) && cuddIsConstant(G)) return(DD_ZERO(dd));
     if (F > G) { /* swap f and g */
-	*f = G;
-	*g = F;
+        *f = G;
+        *g = F;
     }
     return(NULL);
 
@@ -604,8 +604,8 @@ Cudd_addNor(
     if (F == DD_ONE(dd) || G == DD_ONE(dd)) return(DD_ZERO(dd));
     if (cuddIsConstant(F) && cuddIsConstant(G)) return(DD_ONE(dd));
     if (F > G) { /* swap f and g */
-	*f = G;
-	*g = F;
+        *f = G;
+        *g = F;
     }
     return(NULL);
 
@@ -636,8 +636,8 @@ Cudd_addXor(
     if (G == DD_ONE(dd) && F == DD_ZERO(dd)) return(DD_ONE(dd));
     if (cuddIsConstant(F) && cuddIsConstant(G)) return(DD_ZERO(dd));
     if (F > G) { /* swap f and g */
-	*f = G;
-	*g = F;
+        *f = G;
+        *g = F;
     }
     return(NULL);
 
@@ -668,8 +668,8 @@ Cudd_addXnor(
     if (G == DD_ZERO(dd) && F == DD_ZERO(dd)) return(DD_ONE(dd));
     if (cuddIsConstant(F) && cuddIsConstant(G)) return(DD_ZERO(dd));
     if (F > G) { /* swap f and g */
-	*f = G;
-	*g = F;
+        *f = G;
+        *g = F;
     }
     return(NULL);
 
@@ -695,8 +695,8 @@ Cudd_addMonadicApply(
     DdNode *res;
 
     do {
-	dd->reordered = 0;
-	res = cuddAddMonadicApplyRecur(dd,op,f);
+        dd->reordered = 0;
+        res = cuddAddMonadicApplyRecur(dd,op,f);
     } while (dd->reordered == 1);
     if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
         dd->timeoutHandler(dd, dd->tohArg);
@@ -725,9 +725,9 @@ Cudd_addLog(
   DdNode * f)
 {
     if (cuddIsConstant(f)) {
-	CUDD_VALUE_TYPE value = log(cuddV(f));
-	DdNode *res = cuddUniqueConst(dd,value);
-	return(res);
+        CUDD_VALUE_TYPE value = log(cuddV(f));
+        DdNode *res = cuddUniqueConst(dd,value);
+        return(res);
     }
     return(NULL);
 
@@ -757,8 +757,8 @@ cuddAddApplyRecur(
   DdNode * g)
 {
     DdNode *res,
-	   *fv, *fvn, *gv, *gvn,
-	   *T, *E;
+           *fv, *fvn, *gv, *gvn,
+           *T, *E;
     int ford, gord;
     unsigned int index;
     DD_CTFP cacheOp;
@@ -781,18 +781,18 @@ cuddAddApplyRecur(
     ford = cuddI(dd,f->index);
     gord = cuddI(dd,g->index);
     if (ford <= gord) {
-	index = f->index;
-	fv = cuddT(f);
-	fvn = cuddE(f);
+        index = f->index;
+        fv = cuddT(f);
+        fvn = cuddE(f);
     } else {
-	index = g->index;
-	fv = fvn = f;
+        index = g->index;
+        fv = fvn = f;
     }
     if (gord <= ford) {
-	gv = cuddT(g);
-	gvn = cuddE(g);
+        gv = cuddT(g);
+        gvn = cuddE(g);
     } else {
-	gv = gvn = g;
+        gv = gvn = g;
     }
 
     T = cuddAddApplyRecur(dd,op,fv,gv);
@@ -801,16 +801,16 @@ cuddAddApplyRecur(
 
     E = cuddAddApplyRecur(dd,op,fvn,gvn);
     if (E == NULL) {
-	Cudd_RecursiveDeref(dd,T);
-	return(NULL);
+        Cudd_RecursiveDeref(dd,T);
+        return(NULL);
     }
     cuddRef(E);
 
     res = (T == E) ? T : cuddUniqueInter(dd,(int)index,T,E);
     if (res == NULL) {
-	Cudd_RecursiveDeref(dd, T);
-	Cudd_RecursiveDeref(dd, E);
-	return(NULL);
+        Cudd_RecursiveDeref(dd, T);
+        Cudd_RecursiveDeref(dd, E);
+        return(NULL);
     }
     cuddDeref(T);
     cuddDeref(E);
@@ -864,16 +864,16 @@ cuddAddMonadicApplyRecur(
 
     E = cuddAddMonadicApplyRecur(dd,op,fe);
     if (E == NULL) {
-	Cudd_RecursiveDeref(dd,T);
-	return(NULL);
+        Cudd_RecursiveDeref(dd,T);
+        return(NULL);
     }
     cuddRef(E);
 
     res = (T == E) ? T : cuddUniqueInter(dd,(int)index,T,E);
     if (res == NULL) {
-	Cudd_RecursiveDeref(dd, T);
-	Cudd_RecursiveDeref(dd, E);
-	return(NULL);
+        Cudd_RecursiveDeref(dd, T);
+        Cudd_RecursiveDeref(dd, E);
+        return(NULL);
     }
     cuddDeref(T);
     cuddDeref(E);
