@@ -1,5 +1,5 @@
 /**
-  @file 
+  @file
 
   @ingroup cudd
 
@@ -69,15 +69,15 @@
 /**
  * @brief Value returned my many functions when memory is exhausted.
  */
-#define CUDD_OUT_OF_MEM		-1
+#define CUDD_OUT_OF_MEM -1
 /* The sizes of the subtables and the cache must be powers of two. */
-#define CUDD_UNIQUE_SLOTS	256	/**< Initial size of subtables */
-#define CUDD_CACHE_SLOTS	262144	/**< Default size of the cache */
+#define CUDD_UNIQUE_SLOTS 256 /**< Initial size of subtables */
+#define CUDD_CACHE_SLOTS 262144 /**< Default size of the cache */
 
 /* Constants for residue functions. */
-#define CUDD_RESIDUE_DEFAULT	0
-#define CUDD_RESIDUE_MSB	1
-#define CUDD_RESIDUE_TC		2
+#define CUDD_RESIDUE_DEFAULT 0
+#define CUDD_RESIDUE_MSB 1
+#define CUDD_RESIDUE_TC 2
 
 /*---------------------------------------------------------------------------*/
 /* Stucture declarations                                                     */
@@ -311,7 +311,7 @@ typedef void (*DD_TOHFP)(DdManager *, void *);
 /**
   @brief Returns the regular version of a pointer.
 
-  @details 
+  @details
 
   @sideeffect none
 
@@ -324,7 +324,7 @@ typedef void (*DD_TOHFP)(DdManager *, void *);
 /**
   @brief Returns the complemented version of a pointer.
 
-  @details 
+  @details
 
   @sideeffect none
 
@@ -337,7 +337,7 @@ typedef void (*DD_TOHFP)(DdManager *, void *);
 /**
   @brief Returns 1 if a pointer is complemented.
 
-  @details 
+  @details
 
   @sideeffect none
 
@@ -393,8 +393,8 @@ typedef void (*DD_TOHFP)(DdManager *, void *);
 */
 #define Cudd_ForeachCube(manager, f, gen, cube, value)\
     for((gen) = Cudd_FirstCube(manager, f, &cube, &value);\
-	Cudd_IsGenEmpty(gen) ? Cudd_GenFree(gen) : CUDD_TRUE;\
-	(void) Cudd_NextCube(gen, &cube, &value))
+        Cudd_IsGenEmpty(gen) ? Cudd_GenFree(gen) : CUDD_TRUE;\
+        (void) Cudd_NextCube(gen, &cube, &value))
 
 
 /**
@@ -424,8 +424,8 @@ typedef void (*DD_TOHFP)(DdManager *, void *);
 */
 #define Cudd_ForeachPrime(manager, l, u, gen, cube)\
     for((gen) = Cudd_FirstPrime(manager, l, u, &cube);\
-	Cudd_IsGenEmpty(gen) ? Cudd_GenFree(gen) : CUDD_TRUE;\
-	(void) Cudd_NextPrime(gen, &cube))
+        Cudd_IsGenEmpty(gen) ? Cudd_GenFree(gen) : CUDD_TRUE;\
+        (void) Cudd_NextPrime(gen, &cube))
 
 
 /**
@@ -457,8 +457,8 @@ typedef void (*DD_TOHFP)(DdManager *, void *);
 */
 #define Cudd_ForeachNode(manager, f, gen, node)\
     for((gen) = Cudd_FirstNode(manager, f, &node);\
-	Cudd_IsGenEmpty(gen) ? Cudd_GenFree(gen) : CUDD_TRUE;\
-	(void) Cudd_NextNode(gen, &node))
+        Cudd_IsGenEmpty(gen) ? Cudd_GenFree(gen) : CUDD_TRUE;\
+        (void) Cudd_NextNode(gen, &node))
 
 
 /**
@@ -490,8 +490,8 @@ typedef void (*DD_TOHFP)(DdManager *, void *);
 */
 #define Cudd_zddForeachPath(manager, f, gen, path)\
     for((gen) = Cudd_zddFirstPath(manager, f, &path);\
-	Cudd_IsGenEmpty(gen) ? Cudd_GenFree(gen) : CUDD_TRUE;\
-	(void) Cudd_zddNextPath(gen, &path))
+        Cudd_IsGenEmpty(gen) ? Cudd_GenFree(gen) : CUDD_TRUE;\
+        (void) Cudd_zddNextPath(gen, &path))
 
 
 
