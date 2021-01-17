@@ -156,6 +156,49 @@ Cudd_addPlus(
 
 
 /**
+  @brief Natural log of sum of exponentials (with trick to avoid underflow/overflow).
+
+  @return NULL if not a terminal case; ln(e^f + e^g) otherwise.
+
+  @sideeffect None
+
+  @see Cudd_addApply
+
+  @author Vu Phan (https://vuphan314.github.io/)
+
+*/
+DdNode *
+Cudd_addLogSumExp(
+  DdManager * dd,
+  DdNode ** f,
+  DdNode ** g)
+{
+    DdNode *res;
+    DdNode *F, *G;
+    CUDD_VALUE_TYPE value;
+
+    F = *f; G = *g;
+    if (F == DD_ZERO(dd)) return(G);
+    if (G == DD_ZERO(dd)) return(F);
+    if (cuddIsConstant(F) && cuddIsConstant(G)) {
+        CUDD_VALUE_TYPE f, g, m;
+        f = cuddV(F);
+        g = cuddV(G);
+        m = fmax(f, g);
+        value = log(exp(f - m) + exp(g - m)) + m;
+        res = cuddUniqueConst(dd,value);
+        return(res);
+    }
+    if (F > G) { /* swap f and g */
+        *f = G;
+        *g = F;
+    }
+    return(NULL);
+
+} /* end of Cudd_addLogSumExp */
+
+
+/**
   @brief Integer and floating point multiplication.
 
   @details This function can be used also to take the AND of two 0-1
