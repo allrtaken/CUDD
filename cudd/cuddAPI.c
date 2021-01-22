@@ -112,8 +112,8 @@ Cudd_addNewVar(
         return(NULL);
     }
     do {
-	dd->reordered = 0;
-	res = cuddUniqueInter(dd,dd->size,DD_ONE(dd),DD_ZERO(dd));
+        dd->reordered = 0;
+        res = cuddUniqueInter(dd,dd->size,DD_ONE(dd),DD_ZERO(dd));
     } while (dd->reordered == 1);
     if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
         dd->timeoutHandler(dd, dd->tohArg);
@@ -151,8 +151,8 @@ Cudd_addNewVarAtLevel(
     if (level >= dd->size) return(Cudd_addIthVar(dd,level));
     if (!cuddInsertSubtables(dd,1,level)) return(NULL);
     do {
-	dd->reordered = 0;
-	res = cuddUniqueInter(dd,dd->size - 1,DD_ONE(dd),DD_ZERO(dd));
+        dd->reordered = 0;
+        res = cuddUniqueInter(dd,dd->size - 1,DD_ONE(dd),DD_ZERO(dd));
     } while (dd->reordered == 1);
     if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
         dd->timeoutHandler(dd, dd->tohArg);
@@ -271,8 +271,8 @@ Cudd_addIthVar(
         return(NULL);
     }
     do {
-	dd->reordered = 0;
-	res = cuddUniqueInter(dd,i,DD_ONE(dd),DD_ZERO(dd));
+        dd->reordered = 0;
+        res = cuddUniqueInter(dd,i,DD_ONE(dd),DD_ZERO(dd));
     } while (dd->reordered == 1);
     if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
         dd->timeoutHandler(dd, dd->tohArg);
@@ -309,9 +309,9 @@ Cudd_bddIthVar(
         return(NULL);
     }
     if (i < dd->size) {
-	res = dd->vars[i];
+        res = dd->vars[i];
     } else {
-	res = cuddUniqueInter(dd,i,dd->one,Cudd_Not(dd->one));
+        res = cuddUniqueInter(dd,i,dd->one,Cudd_Not(dd->one));
     }
 
     return(res);
@@ -355,33 +355,33 @@ Cudd_zddIthVar(
     /* First we build the node at the level of index i. */
     lower = (i < dd->sizeZ - 1) ? dd->univ[dd->permZ[i]+1] : DD_ONE(dd);
     do {
-	dd->reordered = 0;
-	zvar = cuddUniqueInterZdd(dd, i, lower, DD_ZERO(dd));
+        dd->reordered = 0;
+        zvar = cuddUniqueInterZdd(dd, i, lower, DD_ZERO(dd));
     } while (dd->reordered == 1);
     if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
         dd->timeoutHandler(dd, dd->tohArg);
     }
 
     if (zvar == NULL)
-	return(NULL);
+        return(NULL);
     cuddRef(zvar);
 
     /* Now we add the "filler" nodes above the level of index i. */
     for (j = dd->permZ[i] - 1; j >= 0; j--) {
-	do {
-	    dd->reordered = 0;
-	    res = cuddUniqueInterZdd(dd, dd->invpermZ[j], zvar, zvar);
-	} while (dd->reordered == 1);
-	if (res == NULL) {
-	    Cudd_RecursiveDerefZdd(dd,zvar);
+        do {
+            dd->reordered = 0;
+            res = cuddUniqueInterZdd(dd, dd->invpermZ[j], zvar, zvar);
+        } while (dd->reordered == 1);
+        if (res == NULL) {
+            Cudd_RecursiveDerefZdd(dd,zvar);
             if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
                 dd->timeoutHandler(dd, dd->tohArg);
             }
-	    return(NULL);
-	}
-	cuddRef(res);
-	Cudd_RecursiveDerefZdd(dd,zvar);
-	zvar = res;
+            return(NULL);
+        }
+        cuddRef(res);
+        Cudd_RecursiveDerefZdd(dd,zvar);
+        zvar = res;
     }
     cuddDeref(zvar);
     return(zvar);
@@ -427,75 +427,72 @@ Cudd_zddVarsFromBddVars(
     }
     allnew = dd->sizeZ == 0;
     if (dd->size * multiplicity > dd->sizeZ) {
-	res = cuddResizeTableZdd(dd,dd->size * multiplicity - 1);
-	if (res == 0) return(0);
+        res = cuddResizeTableZdd(dd,dd->size * multiplicity - 1);
+        if (res == 0) return(0);
     }
     /* Impose the order of the BDD variables to the ZDD variables. */
     if (allnew) {
-	for (i = 0; i < dd->size; i++) {
-	    for (j = 0; j < multiplicity; j++) {
-		dd->permZ[i * multiplicity + j] =
-		    dd->perm[i] * multiplicity + j;
-		dd->invpermZ[dd->permZ[i * multiplicity + j]] =
-		    i * multiplicity + j;
-	    }
-	}
-	for (i = 0; i < dd->sizeZ; i++) {
-	    dd->univ[i]->index = dd->invpermZ[i];
-	}
+        for (i = 0; i < dd->size; i++) {
+            for (j = 0; j < multiplicity; j++) {
+                dd->permZ[i * multiplicity + j] = dd->perm[i] * multiplicity + j;
+                dd->invpermZ[dd->permZ[i * multiplicity + j]] = i * multiplicity + j;
+            }
+        }
+        for (i = 0; i < dd->sizeZ; i++) {
+            dd->univ[i]->index = dd->invpermZ[i];
+        }
     } else {
-	permutation = ALLOC(int,dd->sizeZ);
-	if (permutation == NULL) {
-	    dd->errorCode = CUDD_MEMORY_OUT;
-	    return(0);
-	}
-	for (i = 0; i < dd->size; i++) {
-	    for (j = 0; j < multiplicity; j++) {
-		permutation[i * multiplicity + j] =
-		    dd->invperm[i] * multiplicity + j;
-	    }
-	}
-	for (i = dd->size * multiplicity; i < dd->sizeZ; i++) {
-	    permutation[i] = i;
-	}
-	res = Cudd_zddShuffleHeap(dd, permutation);
-	FREE(permutation);
-	if (res == 0) return(0);
+        permutation = ALLOC(int,dd->sizeZ);
+        if (permutation == NULL) {
+            dd->errorCode = CUDD_MEMORY_OUT;
+            return(0);
+        }
+        for (i = 0; i < dd->size; i++) {
+            for (j = 0; j < multiplicity; j++) {
+                permutation[i * multiplicity + j] = dd->invperm[i] * multiplicity + j;
+            }
+        }
+        for (i = dd->size * multiplicity; i < dd->sizeZ; i++) {
+            permutation[i] = i;
+        }
+        res = Cudd_zddShuffleHeap(dd, permutation);
+        FREE(permutation);
+        if (res == 0) return(0);
     }
     /* Copy and expand the variable group tree if it exists. */
     if (dd->treeZ != NULL) {
-	Cudd_FreeZddTree(dd);
+        Cudd_FreeZddTree(dd);
     }
     if (dd->tree != NULL) {
-	dd->treeZ = Mtr_CopyTree(dd->tree, multiplicity);
-	if (dd->treeZ == NULL) return(0);
+        dd->treeZ = Mtr_CopyTree(dd->tree, multiplicity);
+        if (dd->treeZ == NULL) return(0);
     } else if (multiplicity > 1) {
-	dd->treeZ = Mtr_InitGroupTree(0, dd->sizeZ);
-	if (dd->treeZ == NULL) return(0);
-	dd->treeZ->index = dd->invpermZ[0];
+        dd->treeZ = Mtr_InitGroupTree(0, dd->sizeZ);
+        if (dd->treeZ == NULL) return(0);
+        dd->treeZ->index = dd->invpermZ[0];
     }
     /* Create groups for the ZDD variables derived from the same BDD variable.
     */
     if (multiplicity > 1) {
-	char *vmask, *lmask;
+        char *vmask, *lmask;
 
-	vmask = ALLOC(char, dd->size);
-	if (vmask == NULL) {
-	    dd->errorCode = CUDD_MEMORY_OUT;
-	    return(0);
-	}
-	lmask =  ALLOC(char, dd->size);
-	if (lmask == NULL) {
-	    dd->errorCode = CUDD_MEMORY_OUT;
-	    return(0);
-	}
-	for (i = 0; i < dd->size; i++) {
-	    vmask[i] = lmask[i] = 0;
-	}
-	res = addMultiplicityGroups(dd,dd->treeZ,multiplicity,vmask,lmask);
-	FREE(vmask);
-	FREE(lmask);
-	if (res == 0) return(0);
+        vmask = ALLOC(char, dd->size);
+        if (vmask == NULL) {
+            dd->errorCode = CUDD_MEMORY_OUT;
+            return(0);
+        }
+        lmask =  ALLOC(char, dd->size);
+        if (lmask == NULL) {
+            dd->errorCode = CUDD_MEMORY_OUT;
+            return(0);
+        }
+        for (i = 0; i < dd->size; i++) {
+            vmask[i] = lmask[i] = 0;
+        }
+        res = addMultiplicityGroups(dd,dd->treeZ,multiplicity,vmask,lmask);
+        FREE(vmask);
+        FREE(lmask);
+        if (res == 0) return(0);
     }
     return(1);
 
@@ -991,7 +988,7 @@ Cudd_AutodynEnable(
 {
     unique->autoDyn = 1;
     if (method != CUDD_REORDER_SAME) {
-	unique->autoMethod = method;
+        unique->autoMethod = method;
     }
 #ifndef DD_NO_DEATH_ROW
     /* If reordering is enabled, using the death row causes too many
@@ -1001,10 +998,9 @@ Cudd_AutodynEnable(
     unique->deathRowDepth = 1;
     unique->deadMask = unique->deathRowDepth - 1;
     if ((unsigned) unique->nextDead > unique->deadMask) {
-	unique->nextDead = 0;
+        unique->nextDead = 0;
     }
-    unique->deathRow = REALLOC(DdNodePtr, unique->deathRow,
-	unique->deathRowDepth);
+    unique->deathRow = REALLOC(DdNodePtr, unique->deathRow, unique->deathRowDepth);
 #endif
     return;
 
@@ -1051,8 +1047,7 @@ Cudd_ReorderingStatus(
   DdManager * unique,
   Cudd_ReorderingType * method)
 {
-    if (method)
-	*method = unique->autoMethod;
+    if (method) *method = unique->autoMethod;
     return(unique->autoDyn);
 
 } /* end of Cudd_ReorderingStatus */
@@ -1078,7 +1073,7 @@ Cudd_AutodynEnableZdd(
 {
     unique->autoDynZ = 1;
     if (method != CUDD_REORDER_SAME) {
-	unique->autoMethodZ = method;
+        unique->autoMethodZ = method;
     }
     return;
 
@@ -1309,8 +1304,7 @@ Cudd_ReadZddOne(
   DdManager * dd,
   int  i)
 {
-    if (i < 0)
-	return(NULL);
+    if (i < 0) return(NULL);
     return(i < dd->sizeZ ? dd->univ[i] : DD_ONE(dd));
 
 } /* end of Cudd_ReadZddOne */
@@ -1460,7 +1454,7 @@ Cudd_ReadCacheUsedSlots(
     int i;
 
     for (i = 0; i < slots; i++) {
-	used += cache[i].h != 0;
+        used += cache[i].h != 0;
     }
 
     return((double)used / (double) dd->cacheSlots);
@@ -1480,8 +1474,7 @@ double
 Cudd_ReadCacheLookUps(
   DdManager * dd)
 {
-    return(dd->cacheHits + dd->cacheMisses +
-	   dd->totCachehits + dd->totCacheMisses);
+    return(dd->cacheHits + dd->cacheMisses + dd->totCachehits + dd->totCacheMisses);
 
 } /* end of Cudd_ReadCacheLookUps */
 
@@ -1610,9 +1603,8 @@ Cudd_SetLooseUpTo(
   unsigned int lut)
 {
     if (lut == 0) {
-	unsigned long datalimit = getSoftDataLimit();
-	lut = (unsigned int) (datalimit / (sizeof(DdNode) *
-					   DD_MAX_LOOSE_FRACTION));
+        unsigned long datalimit = getSoftDataLimit();
+        lut = (unsigned int) (datalimit / (sizeof(DdNode) * DD_MAX_LOOSE_FRACTION));
     }
     dd->looseUpTo = lut;
 
@@ -1673,9 +1665,8 @@ Cudd_SetMaxCacheHard(
   unsigned int mc)
 {
     if (mc == 0) {
-	unsigned long datalimit = getSoftDataLimit();
-	mc = (unsigned int) (datalimit / (sizeof(DdCache) *
-					  DD_MAX_CACHE_FRACTION));
+        unsigned long datalimit = getSoftDataLimit();
+        mc = (unsigned int) (datalimit / (sizeof(DdCache) * DD_MAX_CACHE_FRACTION));
     }
     dd->maxCacheHard = mc;
 
@@ -1759,38 +1750,38 @@ Cudd_ReadUsedSlots(
 
     /* Scan each BDD/ADD subtable. */
     for (i = 0; i < size; i++) {
-	subtable = &(dd->subtables[i]);
-	nodelist = subtable->nodelist;
-	for (j = 0; (unsigned) j < subtable->slots; j++) {
-	    node = nodelist[j];
-	    if (node != sentinel) {
-		used++;
-	    }
-	}
+        subtable = &(dd->subtables[i]);
+        nodelist = subtable->nodelist;
+        for (j = 0; (unsigned) j < subtable->slots; j++) {
+            node = nodelist[j];
+            if (node != sentinel) {
+                used++;
+            }
+        }
     }
 
     /* Scan the ZDD subtables. */
     size = dd->sizeZ;
 
     for (i = 0; i < size; i++) {
-	subtable = &(dd->subtableZ[i]);
-	nodelist = subtable->nodelist;
-	for (j = 0; (unsigned) j < subtable->slots; j++) {
-	    node = nodelist[j];
-	    if (node != NULL) {
-		used++;
-	    }
-	}
+        subtable = &(dd->subtableZ[i]);
+        nodelist = subtable->nodelist;
+        for (j = 0; (unsigned) j < subtable->slots; j++) {
+            node = nodelist[j];
+            if (node != NULL) {
+                used++;
+            }
+        }
     }
 
     /* Constant table. */
     subtable = &(dd->constants);
     nodelist = subtable->nodelist;
     for (j = 0; (unsigned) j < subtable->slots; j++) {
-	node = nodelist[j];
-	if (node != NULL) {
-	    used++;
-	}
+        node = nodelist[j];
+        if (node != NULL) {
+            used++;
+        }
     }
 
     return((double)used / (double) dd->slots);
@@ -1830,24 +1821,23 @@ Cudd_ExpectedUsedSlots(
 
     /* Scan each BDD/ADD subtable. */
     for (i = 0; i < size; i++) {
-	subtable = &(dd->subtables[i]);
-	empty += (double) subtable->slots *
-	    exp(-(double) subtable->keys / (double) subtable->slots);
+        subtable = &(dd->subtables[i]);
+        empty += (double) subtable->slots *
+            exp(-(double) subtable->keys / (double) subtable->slots);
     }
 
     /* Scan the ZDD subtables. */
     size = dd->sizeZ;
 
     for (i = 0; i < size; i++) {
-	subtable = &(dd->subtableZ[i]);
-	empty += (double) subtable->slots *
-	    exp(-(double) subtable->keys / (double) subtable->slots);
+        subtable = &(dd->subtableZ[i]);
+        empty += (double) subtable->slots *
+            exp(-(double) subtable->keys / (double) subtable->slots);
     }
 
     /* Constant table. */
     subtable = &(dd->constants);
-    empty += (double) subtable->slots *
-	exp(-(double) subtable->keys / (double) subtable->slots);
+    empty += (double) subtable->slots * exp(-(double) subtable->keys / (double) subtable->slots);
 
     return(1.0 - empty / (double) dd->slots);
 
@@ -2397,7 +2387,7 @@ Cudd_SetTree(
   MtrNode * tree)
 {
     if (dd->tree != NULL) {
-	Mtr_FreeTree(dd->tree);
+        Mtr_FreeTree(dd->tree);
     }
     dd->tree = tree;
     if (tree == NULL) return;
@@ -2421,8 +2411,8 @@ Cudd_FreeTree(
   DdManager * dd)
 {
     if (dd->tree != NULL) {
-	Mtr_FreeTree(dd->tree);
-	dd->tree = NULL;
+        Mtr_FreeTree(dd->tree);
+        dd->tree = NULL;
     }
     return;
 
@@ -2460,7 +2450,7 @@ Cudd_SetZddTree(
   MtrNode * tree)
 {
     if (dd->treeZ != NULL) {
-	Mtr_FreeTree(dd->treeZ);
+        Mtr_FreeTree(dd->treeZ);
     }
     dd->treeZ = tree;
     if (tree == NULL) return;
@@ -2484,8 +2474,8 @@ Cudd_FreeZddTree(
   DdManager * dd)
 {
     if (dd->treeZ != NULL) {
-	Mtr_FreeTree(dd->treeZ);
-	dd->treeZ = NULL;
+        Mtr_FreeTree(dd->treeZ);
+        dd->treeZ = NULL;
     }
     return;
 
@@ -3155,69 +3145,47 @@ Cudd_PrintInfo(
     /* Modifiable parameters. */
     retval = fprintf(fp,"**** CUDD modifiable parameters ****\n");
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Hard limit for cache size: %u\n",
-		     Cudd_ReadMaxCacheHard(dd));
+    retval = fprintf(fp,"Hard limit for cache size: %u\n", Cudd_ReadMaxCacheHard(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Cache hit threshold for resizing: %u%%\n",
-		     Cudd_ReadMinHit(dd));
+    retval = fprintf(fp,"Cache hit threshold for resizing: %u%%\n", Cudd_ReadMinHit(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Garbage collection enabled: %s\n",
-		     Cudd_GarbageCollectionEnabled(dd) ? "yes" : "no");
+    retval = fprintf(fp,"Garbage collection enabled: %s\n", Cudd_GarbageCollectionEnabled(dd) ? "yes" : "no");
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Limit for fast unique table growth: %u\n",
-		     Cudd_ReadLooseUpTo(dd));
+    retval = fprintf(fp,"Limit for fast unique table growth: %u\n", Cudd_ReadLooseUpTo(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,
-		     "Maximum number of variables sifted per reordering: %d\n",
-		     Cudd_ReadSiftMaxVar(dd));
+    retval = fprintf(fp, "Maximum number of variables sifted per reordering: %d\n", Cudd_ReadSiftMaxVar(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,
-		     "Maximum number of variable swaps per reordering: %d\n",
-		     Cudd_ReadSiftMaxSwap(dd));
+    retval = fprintf(fp, "Maximum number of variable swaps per reordering: %d\n", Cudd_ReadSiftMaxSwap(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Maximum growth while sifting a variable: %g\n",
-		     Cudd_ReadMaxGrowth(dd));
+    retval = fprintf(fp,"Maximum growth while sifting a variable: %g\n", Cudd_ReadMaxGrowth(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Dynamic reordering of BDDs enabled: %s\n",
-		     Cudd_ReorderingStatus(dd,&autoMethod) ? "yes" : "no");
+    retval = fprintf(fp,"Dynamic reordering of BDDs enabled: %s\n", Cudd_ReorderingStatus(dd,&autoMethod) ? "yes" : "no");
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Default BDD reordering method: %d\n",
-		     (int) autoMethod);
+    retval = fprintf(fp,"Default BDD reordering method: %d\n", (int) autoMethod);
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Dynamic reordering of ZDDs enabled: %s\n",
-		     Cudd_ReorderingStatusZdd(dd,&autoMethodZ) ? "yes" : "no");
+    retval = fprintf(fp,"Dynamic reordering of ZDDs enabled: %s\n", Cudd_ReorderingStatusZdd(dd,&autoMethodZ) ? "yes" : "no");
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Default ZDD reordering method: %d\n",
-		     (int) autoMethodZ);
+    retval = fprintf(fp,"Default ZDD reordering method: %d\n", (int) autoMethodZ);
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Realignment of ZDDs to BDDs enabled: %s\n",
-		     Cudd_zddRealignmentEnabled(dd) ? "yes" : "no");
+    retval = fprintf(fp,"Realignment of ZDDs to BDDs enabled: %s\n", Cudd_zddRealignmentEnabled(dd) ? "yes" : "no");
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Realignment of BDDs to ZDDs enabled: %s\n",
-		     Cudd_bddRealignmentEnabled(dd) ? "yes" : "no");
+    retval = fprintf(fp,"Realignment of BDDs to ZDDs enabled: %s\n", Cudd_bddRealignmentEnabled(dd) ? "yes" : "no");
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Dead nodes counted in triggering reordering: %s\n",
-		     Cudd_DeadAreCounted(dd) ? "yes" : "no");
+    retval = fprintf(fp,"Dead nodes counted in triggering reordering: %s\n", Cudd_DeadAreCounted(dd) ? "yes" : "no");
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Group checking criterion: %u\n",
-		     (unsigned int) Cudd_ReadGroupcheck(dd));
+    retval = fprintf(fp,"Group checking criterion: %u\n", (unsigned int) Cudd_ReadGroupcheck(dd));
     if (retval == EOF) return(0);
     retval = fprintf(fp,"Recombination threshold: %d\n", Cudd_ReadRecomb(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Symmetry violation threshold: %d\n",
-		     Cudd_ReadSymmviolation(dd));
+    retval = fprintf(fp,"Symmetry violation threshold: %d\n", Cudd_ReadSymmviolation(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Arc violation threshold: %d\n",
-		     Cudd_ReadArcviolation(dd));
+    retval = fprintf(fp,"Arc violation threshold: %d\n", Cudd_ReadArcviolation(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"GA population size: %d\n",
-		     Cudd_ReadPopulationSize(dd));
+    retval = fprintf(fp,"GA population size: %d\n", Cudd_ReadPopulationSize(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Number of crossovers for GA: %d\n",
-		     Cudd_ReadNumberXovers(dd));
+    retval = fprintf(fp,"Number of crossovers for GA: %d\n", Cudd_ReadNumberXovers(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Next reordering threshold: %u\n",
-		     Cudd_ReadNextReordering(dd));
+    retval = fprintf(fp,"Next reordering threshold: %u\n", Cudd_ReadNextReordering(dd));
     if (retval == EOF) return(0);
 
     /* Non-modifiable parameters. */
@@ -3226,11 +3194,9 @@ Cudd_PrintInfo(
     retval = fprintf(fp,"Memory in use: %" PRIszt "\n",
                      Cudd_ReadMemoryInUse(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Peak number of nodes: %ld\n",
-		     Cudd_ReadPeakNodeCount(dd));
+    retval = fprintf(fp,"Peak number of nodes: %ld\n", Cudd_ReadPeakNodeCount(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Peak number of live nodes: %d\n",
-		     Cudd_ReadPeakLiveNodeCount(dd));
+    retval = fprintf(fp,"Peak number of live nodes: %d\n", Cudd_ReadPeakLiveNodeCount(dd));
     if (retval == EOF) return(0);
     retval = fprintf(fp,"Number of BDD variables: %d\n", dd->size);
     if (retval == EOF) return(0);
@@ -3238,37 +3204,28 @@ Cudd_PrintInfo(
     if (retval == EOF) return(0);
     retval = fprintf(fp,"Number of cache entries: %u\n", dd->cacheSlots);
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Number of cache look-ups: %.0f\n",
-		     Cudd_ReadCacheLookUps(dd));
+    retval = fprintf(fp,"Number of cache look-ups: %.0f\n", Cudd_ReadCacheLookUps(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Number of cache hits: %.0f\n",
-		     Cudd_ReadCacheHits(dd));
+    retval = fprintf(fp,"Number of cache hits: %.0f\n", Cudd_ReadCacheHits(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Number of cache insertions: %.0f\n",
-		     dd->cacheinserts);
+    retval = fprintf(fp,"Number of cache insertions: %.0f\n", dd->cacheinserts);
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Number of cache collisions: %.0f\n",
-		     dd->cachecollisions);
+    retval = fprintf(fp,"Number of cache collisions: %.0f\n", dd->cachecollisions);
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Number of cache deletions: %.0f\n",
-		     dd->cachedeletions);
+    retval = fprintf(fp,"Number of cache deletions: %.0f\n", dd->cachedeletions);
     if (retval == EOF) return(0);
     retval = cuddCacheProfile(dd,fp);
     if (retval == 0) return(0);
-    retval = fprintf(fp,"Soft limit for cache size: %u\n",
-		     Cudd_ReadMaxCache(dd));
+    retval = fprintf(fp,"Soft limit for cache size: %u\n", Cudd_ReadMaxCache(dd));
     if (retval == EOF) return(0);
     retval = fprintf(fp,"Number of buckets in unique table: %u\n", dd->slots);
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Used buckets in unique table: %.2f%% (expected %.2f%%)\n",
-		     100.0 * Cudd_ReadUsedSlots(dd),
-		     100.0 * Cudd_ExpectedUsedSlots(dd));
+    retval = fprintf(fp,"Used buckets in unique table: %.2f%% (expected %.2f%%)\n", 100.0 * Cudd_ReadUsedSlots(dd), 100.0 * Cudd_ExpectedUsedSlots(dd));
     if (retval == EOF) return(0);
 #ifdef DD_UNIQUE_PROFILE
     retval = fprintf(fp,"Unique lookups: %.0f\n", dd->uniqueLookUps);
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Unique links: %.0f (%g per lookup)\n",
-	    dd->uniqueLinks, dd->uniqueLinks / dd->uniqueLookUps);
+    retval = fprintf(fp,"Unique links: %.0f (%g per lookup)\n", dd->uniqueLinks, dd->uniqueLinks / dd->uniqueLookUps);
     if (retval == EOF) return(0);
 #endif
     retval = fprintf(fp,"Number of BDD and ADD nodes: %u\n", dd->keys);
@@ -3279,11 +3236,9 @@ Cudd_PrintInfo(
     if (retval == EOF) return(0);
     retval = fprintf(fp,"Number of dead ZDD nodes: %u\n", dd->deadZ);
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Total number of nodes allocated: %.0f\n",
-		     dd->allocated);
+    retval = fprintf(fp,"Total number of nodes allocated: %.0f\n", dd->allocated);
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Total number of nodes reclaimed: %.0f\n",
-		     dd->reclaimed);
+    retval = fprintf(fp,"Total number of nodes reclaimed: %.0f\n", dd->reclaimed);
     if (retval == EOF) return(0);
 #ifdef DD_STATS
     retval = fprintf(fp,"Nodes freed: %.0f\n", dd->nodesFreed);
@@ -3292,24 +3247,19 @@ Cudd_PrintInfo(
     if (retval == EOF) return(0);
 #endif
 #ifdef DD_COUNT
-    retval = fprintf(fp,"Number of recursive calls: %.0f\n",
-		     Cudd_ReadRecursiveCalls(dd));
+    retval = fprintf(fp,"Number of recursive calls: %.0f\n", Cudd_ReadRecursiveCalls(dd));
     if (retval == EOF) return(0);
 #endif
-    retval = fprintf(fp,"Garbage collections so far: %d\n",
-		     Cudd_ReadGarbageCollections(dd));
+    retval = fprintf(fp,"Garbage collections so far: %d\n", Cudd_ReadGarbageCollections(dd));
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Time for garbage collection: %.2f sec\n",
-		     ((double)Cudd_ReadGarbageCollectionTime(dd)/1000.0));
+    retval = fprintf(fp,"Time for garbage collection: %.2f sec\n", ((double)Cudd_ReadGarbageCollectionTime(dd)/1000.0));
     if (retval == EOF) return(0);
     retval = fprintf(fp,"Reorderings so far: %d\n", dd->reorderings);
     if (retval == EOF) return(0);
-    retval = fprintf(fp,"Time for reordering: %.2f sec\n",
-		     ((double)Cudd_ReadReorderingTime(dd)/1000.0));
+    retval = fprintf(fp,"Time for reordering: %.2f sec\n", ((double)Cudd_ReadReorderingTime(dd)/1000.0));
     if (retval == EOF) return(0);
 #ifdef DD_COUNT
-    retval = fprintf(fp,"Node swaps in reordering: %.0f\n",
-	Cudd_ReadSwapSteps(dd));
+    retval = fprintf(fp,"Node swaps in reordering: %.0f\n", Cudd_ReadSwapSteps(dd));
     if (retval == EOF) return(0);
 #endif
 
@@ -3338,8 +3288,8 @@ Cudd_ReadPeakNodeCount(
     DdNodePtr *scan = dd->memoryList;
 
     while (scan != NULL) {
-	count += DD_MEM_CHUNK;
-	scan = (DdNodePtr *) *scan;
+        count += DD_MEM_CHUNK;
+        scan = (DdNodePtr *) *scan;
     }
     return(count);
 
@@ -3361,7 +3311,7 @@ Cudd_ReadPeakLiveNodeCount(
     unsigned int live = dd->keys - dd->dead;
 
     if (live > dd->peakLiveNodes) {
-	dd->peakLiveNodes = live;
+        dd->peakLiveNodes = live;
     }
     return((int)dd->peakLiveNodes);
 
@@ -3397,7 +3347,7 @@ Cudd_ReadNodeCount(
     ** from the node count because they are not part of the BDDs.
     */
     for (i=0; i < dd->size; i++) {
-	if (dd->vars[i]->ref == 1) count--;
+        if (dd->vars[i]->ref == 1) count--;
     }
     /* Subtract from the count the unused constants. */
     if (DD_ZERO(dd)->ref == 1) count--;
@@ -3454,17 +3404,17 @@ Cudd_AddHook(
 
     switch (where) {
     case CUDD_PRE_GC_HOOK:
-	hook = &(dd->preGCHook);
-	break;
+        hook = &(dd->preGCHook);
+        break;
     case CUDD_POST_GC_HOOK:
-	hook = &(dd->postGCHook);
-	break;
+        hook = &(dd->postGCHook);
+        break;
     case CUDD_PRE_REORDERING_HOOK:
-	hook = &(dd->preReorderingHook);
-	break;
+        hook = &(dd->preReorderingHook);
+        break;
     case CUDD_POST_REORDERING_HOOK:
-	hook = &(dd->postReorderingHook);
-	break;
+        hook = &(dd->postReorderingHook);
+        break;
     default:
         return(0);
     }
@@ -3472,18 +3422,18 @@ Cudd_AddHook(
     ** If so, just return. */
     nextHook = *hook;
     while (nextHook != NULL) {
-	if (nextHook->f == f) {
-	    return(2);
-	}
-	hook = &(nextHook->next);
-	nextHook = nextHook->next;
+        if (nextHook->f == f) {
+            return(2);
+        }
+        hook = &(nextHook->next);
+        nextHook = nextHook->next;
     }
     /* The function was not in the list. Create a new item and append it
     ** to the end of the list. */
     newHook = ALLOC(DdHook,1);
     if (newHook == NULL) {
-	dd->errorCode = CUDD_MEMORY_OUT;
-	return(0);
+        dd->errorCode = CUDD_MEMORY_OUT;
+        return(0);
     }
     newHook->next = NULL;
     newHook->f = f;
@@ -3516,29 +3466,29 @@ Cudd_RemoveHook(
 
     switch (where) {
     case CUDD_PRE_GC_HOOK:
-	hook = &(dd->preGCHook);
-	break;
+        hook = &(dd->preGCHook);
+        break;
     case CUDD_POST_GC_HOOK:
-	hook = &(dd->postGCHook);
-	break;
+        hook = &(dd->postGCHook);
+        break;
     case CUDD_PRE_REORDERING_HOOK:
-	hook = &(dd->preReorderingHook);
-	break;
+        hook = &(dd->preReorderingHook);
+        break;
     case CUDD_POST_REORDERING_HOOK:
-	hook = &(dd->postReorderingHook);
-	break;
+        hook = &(dd->postReorderingHook);
+        break;
     default:
         return(0);
     }
     nextHook = *hook;
     while (nextHook != NULL) {
-	if (nextHook->f == f) {
-	    *hook = nextHook->next;
-	    FREE(nextHook);
-	    return(1);
-	}
-	hook = &(nextHook->next);
-	nextHook = nextHook->next;
+        if (nextHook->f == f) {
+            *hook = nextHook->next;
+            FREE(nextHook);
+            return(1);
+        }
+        hook = &(nextHook->next);
+        nextHook = nextHook->next;
     }
 
     return(0);
@@ -3569,26 +3519,26 @@ Cudd_IsInHook(
 
     switch (where) {
     case CUDD_PRE_GC_HOOK:
-	hook = dd->preGCHook;
-	break;
+        hook = dd->preGCHook;
+        break;
     case CUDD_POST_GC_HOOK:
-	hook = dd->postGCHook;
-	break;
+        hook = dd->postGCHook;
+        break;
     case CUDD_PRE_REORDERING_HOOK:
-	hook = dd->preReorderingHook;
-	break;
+        hook = dd->preReorderingHook;
+        break;
     case CUDD_POST_REORDERING_HOOK:
-	hook = dd->postReorderingHook;
-	break;
+        hook = dd->postReorderingHook;
+        break;
     default:
         return(0);
     }
     /* Scan the list and find whether the function is already there. */
     while (hook != NULL) {
-	if (hook->f == f) {
-	    return(1);
-	}
-	hook = hook->next;
+        if (hook->f == f) {
+            return(1);
+        }
+        hook = hook->next;
     }
     return(0);
 
@@ -3599,7 +3549,7 @@ Cudd_IsInHook(
   @brief Sample hook function to call before reordering.
 
   @details Prints on the manager's stdout reordering method and initial size.
-  
+
   @return 1 if successful; 0 otherwise.
 
   @sideeffect None
@@ -3626,60 +3576,59 @@ Cudd_StdPreReordHook(
     case CUDD_REORDER_WINDOW3_CONV:
     case CUDD_REORDER_WINDOW4_CONV:
     case CUDD_REORDER_LINEAR_CONVERGE:
-	retval = fprintf(dd->out,"converging ");
-	if (retval == EOF) return(0);
-	break;
+        retval = fprintf(dd->out,"converging ");
+        if (retval == EOF) return(0);
+        break;
     default:
-	break;
+        break;
     }
     switch (method) {
     case CUDD_REORDER_RANDOM:
     case CUDD_REORDER_RANDOM_PIVOT:
-	retval = fprintf(dd->out,"random");
-	break;
+        retval = fprintf(dd->out,"random");
+        break;
     case CUDD_REORDER_SIFT:
     case CUDD_REORDER_SIFT_CONVERGE:
-	retval = fprintf(dd->out,"sifting");
-	break;
+        retval = fprintf(dd->out,"sifting");
+        break;
     case CUDD_REORDER_SYMM_SIFT:
     case CUDD_REORDER_SYMM_SIFT_CONV:
-	retval = fprintf(dd->out,"symmetric sifting");
-	break;
+        retval = fprintf(dd->out,"symmetric sifting");
+        break;
     case CUDD_REORDER_LAZY_SIFT:
-	retval = fprintf(dd->out,"lazy sifting");
-	break;
+        retval = fprintf(dd->out,"lazy sifting");
+        break;
     case CUDD_REORDER_GROUP_SIFT:
     case CUDD_REORDER_GROUP_SIFT_CONV:
-	retval = fprintf(dd->out,"group sifting");
-	break;
+        retval = fprintf(dd->out,"group sifting");
+        break;
     case CUDD_REORDER_WINDOW2:
     case CUDD_REORDER_WINDOW3:
     case CUDD_REORDER_WINDOW4:
     case CUDD_REORDER_WINDOW2_CONV:
     case CUDD_REORDER_WINDOW3_CONV:
     case CUDD_REORDER_WINDOW4_CONV:
-	retval = fprintf(dd->out,"window");
-	break;
+        retval = fprintf(dd->out,"window");
+        break;
     case CUDD_REORDER_ANNEALING:
-	retval = fprintf(dd->out,"annealing");
-	break;
+        retval = fprintf(dd->out,"annealing");
+        break;
     case CUDD_REORDER_GENETIC:
-	retval = fprintf(dd->out,"genetic");
-	break;
+        retval = fprintf(dd->out,"genetic");
+        break;
     case CUDD_REORDER_LINEAR:
     case CUDD_REORDER_LINEAR_CONVERGE:
-	retval = fprintf(dd->out,"linear sifting");
-	break;
+        retval = fprintf(dd->out,"linear sifting");
+        break;
     case CUDD_REORDER_EXACT:
-	retval = fprintf(dd->out,"exact");
-	break;
+        retval = fprintf(dd->out,"exact");
+        break;
     default:
-	return(0);
+        return(0);
     }
     if (retval == EOF) return(0);
 
-    retval = fprintf(dd->out,": from %ld to ... ", strcmp(str, "BDD") == 0 ?
-		     Cudd_ReadNodeCount(dd) : Cudd_zddReadNodeCount(dd));
+    retval = fprintf(dd->out,": from %ld to ... ", strcmp(str, "BDD") == 0 ? Cudd_ReadNodeCount(dd) : Cudd_zddReadNodeCount(dd));
     if (retval == EOF) return(0);
     fflush(dd->out);
     return(1);
@@ -3691,7 +3640,7 @@ Cudd_StdPreReordHook(
   @brief Sample hook function to call after reordering.
 
   @details Prints on the manager's stdout final size and reordering time.
-  
+
   @return 1 if successful; 0 otherwise.
 
   @sideeffect None
@@ -3710,9 +3659,7 @@ Cudd_StdPostReordHook(
     unsigned long finalTime = util_cpu_time();
     double totalTimeSec = (double)(finalTime - initialTime) / 1000.0;
 
-    retval = fprintf(dd->out,"%ld nodes in %g sec\n", strcmp(str, "BDD") == 0 ?
-		     Cudd_ReadNodeCount(dd) : Cudd_zddReadNodeCount(dd),
-		     totalTimeSec);
+    retval = fprintf(dd->out,"%ld nodes in %g sec\n", strcmp(str, "BDD") == 0 ? Cudd_ReadNodeCount(dd) : Cudd_zddReadNodeCount(dd), totalTimeSec);
     if (retval == EOF) return(0);
     retval = fflush(dd->out);
     if (retval == EOF) return(0);
@@ -3737,10 +3684,10 @@ Cudd_EnableReorderingReporting(
   DdManager *dd)
 {
     if (!Cudd_AddHook(dd, Cudd_StdPreReordHook, CUDD_PRE_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     if (!Cudd_AddHook(dd, Cudd_StdPostReordHook, CUDD_POST_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     return(1);
 
@@ -3763,10 +3710,10 @@ Cudd_DisableReorderingReporting(
   DdManager *dd)
 {
     if (!Cudd_RemoveHook(dd, Cudd_StdPreReordHook, CUDD_PRE_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     if (!Cudd_RemoveHook(dd, Cudd_StdPostReordHook, CUDD_POST_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     return(1);
 
@@ -3827,7 +3774,7 @@ Cudd_PrintGroupedOrder(
     } else {
         return Mtr_PrintGroupedOrder(tree,invperm,dd->out);
     }
-        
+
 } /* end of Cudd_PrintGroupedOrder */
 
 
@@ -3847,16 +3794,16 @@ Cudd_EnableOrderingMonitoring(
   DdManager *dd)
 {
     if (!Cudd_AddHook(dd, Cudd_PrintGroupedOrder, CUDD_PRE_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     if (!Cudd_AddHook(dd, Cudd_StdPreReordHook, CUDD_PRE_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     if (!Cudd_AddHook(dd, Cudd_StdPostReordHook, CUDD_POST_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     if (!Cudd_AddHook(dd, Cudd_PrintGroupedOrder, CUDD_POST_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     return(1);
 
@@ -3879,16 +3826,16 @@ Cudd_DisableOrderingMonitoring(
   DdManager *dd)
 {
     if (!Cudd_RemoveHook(dd, Cudd_StdPreReordHook, CUDD_PRE_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     if (!Cudd_RemoveHook(dd, Cudd_PrintGroupedOrder, CUDD_PRE_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     if (!Cudd_RemoveHook(dd, Cudd_PrintGroupedOrder, CUDD_POST_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     if (!Cudd_RemoveHook(dd, Cudd_StdPostReordHook, CUDD_POST_REORDERING_HOOK)) {
-	return(0);
+        return(0);
     }
     return(1);
 
@@ -3925,7 +3872,7 @@ Cudd_SetApplicationHook(
   DdManager *dd,
   void * value)
 {
-    dd->hooks = value;  
+    dd->hooks = value;
 
 } /* end of Cudd_SetApplicationHook */
 
@@ -3942,7 +3889,7 @@ void *
 Cudd_ReadApplicationHook(
   DdManager *dd)
 {
-    return(dd->hooks);  
+    return(dd->hooks);
 
 } /* end of Cudd_ReadApplicationHook */
 
@@ -4515,7 +4462,7 @@ Cudd_bddSetVarToBeGrouped(
 {
     if (index >= dd->size || index < 0) return(0);
     if (dd->subtables[dd->perm[index]].varToBeGrouped <= CUDD_LAZY_SOFT_GROUP) {
-	dd->subtables[dd->perm[index]].varToBeGrouped = CUDD_LAZY_SOFT_GROUP;
+        dd->subtables[dd->perm[index]].varToBeGrouped = CUDD_LAZY_SOFT_GROUP;
     }
     return(1);
 
@@ -4565,9 +4512,8 @@ Cudd_bddResetVarToBeGrouped(
   int index)
 {
     if (index >= dd->size || index < 0) return(0);
-    if (dd->subtables[dd->perm[index]].varToBeGrouped <=
-	CUDD_LAZY_SOFT_GROUP) {
-	dd->subtables[dd->perm[index]].varToBeGrouped = CUDD_LAZY_NONE;
+    if (dd->subtables[dd->perm[index]].varToBeGrouped <= CUDD_LAZY_SOFT_GROUP) {
+        dd->subtables[dd->perm[index]].varToBeGrouped = CUDD_LAZY_NONE;
     }
     return(1);
 
@@ -4588,10 +4534,8 @@ Cudd_bddIsVarToBeGrouped(
   int index)
 {
     if (index >= dd->size || index < 0) return(-1);
-    if (dd->subtables[dd->perm[index]].varToBeGrouped == CUDD_LAZY_UNGROUP)
-	return(0);
-    else
-	return(dd->subtables[dd->perm[index]].varToBeGrouped);
+    if (dd->subtables[dd->perm[index]].varToBeGrouped == CUDD_LAZY_UNGROUP) return(0);
+    else return(dd->subtables[dd->perm[index]].varToBeGrouped);
 
 } /* end of Cudd_bddIsVarToBeGrouped */
 
@@ -4665,8 +4609,7 @@ Cudd_bddIsVarHardGroup(
   int index)
 {
     if (index >= dd->size || index < 0) return(-1);
-    if (dd->subtables[dd->perm[index]].varToBeGrouped == CUDD_LAZY_HARD_GROUP)
-	return(1);
+    if (dd->subtables[dd->perm[index]].varToBeGrouped == CUDD_LAZY_HARD_GROUP) return(1);
     return(0);
 
 } /* end of Cudd_bddIsVarToBeGrouped */
@@ -4694,12 +4637,9 @@ fixVarTree(
   int  size)
 {
     treenode->index = treenode->low;
-    treenode->low = ((int) treenode->index < size) ?
-	(MtrHalfWord) perm[treenode->index] : treenode->index;
-    if (treenode->child != NULL)
-	fixVarTree(treenode->child, perm, size);
-    if (treenode->younger != NULL)
-	fixVarTree(treenode->younger, perm, size);
+    treenode->low = ((int) treenode->index < size) ? (MtrHalfWord) perm[treenode->index] : treenode->index;
+    if (treenode->child != NULL) fixVarTree(treenode->child, perm, size);
+    if (treenode->younger != NULL) fixVarTree(treenode->younger, perm, size);
     return;
 
 } /* end of fixVarTree */
@@ -4744,29 +4684,28 @@ addMultiplicityGroups(
     MtrNode *auxnode = treenode;
 
     while (auxnode != NULL) {
-	if (auxnode->child != NULL) {
-	    addMultiplicityGroups(dd,auxnode->child,multiplicity,vmask,lmask);
-	}
-	/* Build remaining groups. */
-	startV = dd->permZ[auxnode->index] / multiplicity;
-	startL = auxnode->low / multiplicity;
-	stopV = startV + auxnode->size / multiplicity;
-	/* Walk down vmask starting at startV and build missing groups. */
-	for (i = startV, j = startL; i < stopV; i++) {
-	    if (vmask[i] == 0) {
-		MtrNode *node;
-		while (lmask[j] == 1) j++;
-		node = Mtr_MakeGroup(auxnode, j * multiplicity, multiplicity,
-				     MTR_FIXED);
-		if (node == NULL) {
-		    return(0);
-		}
-		node->index = dd->invpermZ[i * multiplicity];
-		vmask[i] = 1;
-		lmask[j] = 1;
-	    }
-	}
-	auxnode = auxnode->younger;
+        if (auxnode->child != NULL) {
+            addMultiplicityGroups(dd,auxnode->child,multiplicity,vmask,lmask);
+        }
+        /* Build remaining groups. */
+        startV = dd->permZ[auxnode->index] / multiplicity;
+        startL = auxnode->low / multiplicity;
+        stopV = startV + auxnode->size / multiplicity;
+        /* Walk down vmask starting at startV and build missing groups. */
+        for (i = startV, j = startL; i < stopV; i++) {
+            if (vmask[i] == 0) {
+                MtrNode *node;
+                while (lmask[j] == 1) j++;
+                node = Mtr_MakeGroup(auxnode, j * multiplicity, multiplicity, MTR_FIXED);
+                if (node == NULL) {
+                    return(0);
+                }
+                node->index = dd->invpermZ[i * multiplicity];
+                vmask[i] = 1;
+                lmask[j] = 1;
+            }
+        }
+        auxnode = auxnode->younger;
     }
     return(1);
 
