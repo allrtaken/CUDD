@@ -176,8 +176,8 @@ Cudd_addLogSumExp(
     CUDD_VALUE_TYPE value;
 
     F = *f; G = *g;
-    if (F == DD_ZERO(dd)) return(G);
-    if (G == DD_ZERO(dd)) return(F);
+    if (F == DD_MINUS_INFINITY(dd)) return(G);
+    if (G == DD_MINUS_INFINITY(dd)) return(F);
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
         CUDD_VALUE_TYPE f, g, m;
         f = cuddV(F);
