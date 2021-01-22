@@ -7,7 +7,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(
-  [1.14 -Wall -Werror foreign subdir-objects color-tests silent-rules]
+  [1.16 -Wall -Werror foreign subdir-objects color-tests silent-rules]
 )
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 
