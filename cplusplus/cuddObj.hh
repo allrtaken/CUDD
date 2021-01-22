@@ -198,10 +198,8 @@ public:
       double quality = 1.0) const;
     BDD RemapUnderApprox(int numVars, int threshold = 0, double quality = 1.0) const;
     BDD RemapOverApprox(int numVars, int threshold = 0, double quality = 1.0) const;
-    BDD BiasedUnderApprox(const BDD& bias, int numVars, int threshold = 0,
-                          double quality1 = 1.0, double quality0 = 1.0) const;
-    BDD BiasedOverApprox(const BDD& bias, int numVars, int threshold = 0,
-                         double quality1 = 1.0, double quality0 = 1.0) const;
+    BDD BiasedUnderApprox(const BDD& bias, int numVars, int threshold = 0, double quality1 = 1.0, double quality0 = 1.0) const;
+    BDD BiasedOverApprox(const BDD& bias, int numVars, int threshold = 0, double quality1 = 1.0, double quality0 = 1.0) const;
     BDD ExistAbstract(const BDD& cube, unsigned int limit = 0) const;
     BDD XorExistAbstract(const BDD& g, const BDD& cube) const;
     BDD UnivAbstract(const BDD& cube) const;
@@ -481,7 +479,7 @@ public:
     BDD bddZero(void) const;
     ADD addVar(void) const;
     ADD addVar(int index) const;
-    ADD addLogVar(int index) const;
+    ADD addLogVar(int index, bool positiveLiteral) const;
     ADD addOne(void) const;
     ADD addZero(void) const;
     ADD constant(CUDD_VALUE_TYPE c) const;
@@ -503,8 +501,7 @@ public:
     void IncreaseTimeLimit(unsigned long increase) const;
     void UnsetTimeLimit(void) const;
     bool TimeLimited(void) const;
-    void RegisterTerminationCallback(DD_THFP callback,
-                                     void * callback_arg) const;
+    void RegisterTerminationCallback(DD_THFP callback, void * callback_arg) const;
     void UnregisterTerminationCallback(void) const;
     DD_OOMFP RegisterOutOfMemoryCallback(DD_OOMFP callback) const;
     void UnregisterOutOfMemoryCallback(void) const;
@@ -558,10 +555,8 @@ public:
     MtrNode * ReadZddTree(void) const;
     void SetZddTree(MtrNode * tree) const;
     void FreeZddTree(void) const;
-    MtrNode * MakeTreeNode(unsigned int low, unsigned int size,
-                           unsigned int type) const;
-    MtrNode * MakeZddTreeNode(unsigned int low, unsigned int size,
-                              unsigned int type) const;
+    MtrNode * MakeTreeNode(unsigned int low, unsigned int size, unsigned int type) const;
+    MtrNode * MakeZddTreeNode(unsigned int low, unsigned int size, unsigned int type) const;
 #endif
     int ReadPerm(int i) const;
     int ReadPermZdd(int i) const;
@@ -632,36 +627,24 @@ public:
     void ApaPrintHex(int digits, DdApaNumber number, FILE * fp = stdout) const;
     void ApaPrintDecimal(int digits, DdApaNumber number, FILE * fp = stdout) const;
     std::string ApaStringDecimal(int digits, DdApaNumber number) const;
-    void ApaPrintExponential(int digits, DdApaNumber number,
-                             int precision = 6, FILE * fp = stdout) const;
+    void ApaPrintExponential(int digits, DdApaNumber number, int precision = 6, FILE * fp = stdout) const;
     void DebugCheck(void) const;
     void CheckKeys(void) const;
-    ADD Harwell(FILE * fp, std::vector<ADD>& x, std::vector<ADD>& y,
-                std::vector<ADD>& xn, std::vector<ADD>& yn_,
-                int * m, int * n, int bx = 0, int sx = 2, int by = 1,
-                int sy = 2, int pr = 0) const;
+    ADD Harwell(FILE * fp, std::vector<ADD>& x, std::vector<ADD>& y, std::vector<ADD>& xn, std::vector<ADD>& yn_, int * m, int * n, int bx = 0, int sx = 2, int by = 1, int sy = 2, int pr = 0) const;
     void PrintLinear(void) const;
     int ReadLinear(int x, int y) const;
     BDD Xgty(std::vector<BDD> z, std::vector<BDD> x, std::vector<BDD> y) const;
     BDD Xeqy(std::vector<BDD> x, std::vector<BDD> y) const;
     ADD Xeqy(std::vector<ADD> x, std::vector<ADD> y) const;
-    BDD Dxygtdxz(std::vector<BDD> x, std::vector<BDD> y,
-                 std::vector<BDD> z) const;
-    BDD Dxygtdyz(std::vector<BDD> x, std::vector<BDD> y,
-                 std::vector<BDD> z) const;
+    BDD Dxygtdxz(std::vector<BDD> x, std::vector<BDD> y, std::vector<BDD> z) const;
+    BDD Dxygtdyz(std::vector<BDD> x, std::vector<BDD> y, std::vector<BDD> z) const;
     BDD Inequality(int c, std::vector<BDD> x, std::vector<BDD> y) const;
     BDD Disequality(int c, std::vector<BDD> x, std::vector<BDD> y) const;
-    BDD Interval(std::vector<BDD> x, unsigned int lowerB,
-                 unsigned int upperB) const;
+    BDD Interval(std::vector<BDD> x, unsigned int lowerB, unsigned int upperB) const;
     ADD Hamming(std::vector<ADD> xVars, std::vector<ADD> yVars) const;
-    ADD Read(FILE * fp, std::vector<ADD>& x, std::vector<ADD>& y, std::vector<ADD>& xn,
-             std::vector<ADD>& yn_, int * m, int * n, int bx = 0, int sx = 2,
-             int by = 1, int sy = 2) const;
-    BDD Read(FILE * fp, std::vector<BDD>& x, std::vector<BDD>& y,
-             int * m, int * n, int bx = 0, int sx = 2, int by = 1,
-             int sy = 2) const;
-    void ReduceHeap(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT,
-                    int minsize = 0) const;
+    ADD Read(FILE * fp, std::vector<ADD>& x, std::vector<ADD>& y, std::vector<ADD>& xn, std::vector<ADD>& yn_, int * m, int * n, int bx = 0, int sx = 2, int by = 1, int sy = 2) const;
+    BDD Read(FILE * fp, std::vector<BDD>& x, std::vector<BDD>& y, int * m, int * n, int bx = 0, int sx = 2, int by = 1, int sy = 2) const;
+    void ReduceHeap(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT, int minsize = 0) const;
     void ShuffleHeap(int * permutation) const;
     void SymmProfile(int lower, int upper) const;
     unsigned int Prime(unsigned int pr) const;
@@ -678,8 +661,7 @@ public:
     int32_t Random(void) const;
     void Srandom(int32_t seed) const;
     void zddPrintSubtable() const;
-    void zddReduceHeap(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT,
-                       int minsize = 0) const;
+    void zddReduceHeap(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT, int minsize = 0) const;
     void zddShuffleHeap(int * permutation) const;
     void zddSymmProfile(int lower, int upper) const;
     void DumpDot(

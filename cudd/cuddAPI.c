@@ -244,45 +244,6 @@ Cudd_bddIsVar(
 
 
 /**
-  @brief Returns the %ADD log variable with index i.
-
-  @details Retrieves the %ADD log variable with index i if it already exists,
-  or creates a new %ADD log variable.
-  An %ADD log variable points to DD_ZERO (THEN) and DD_MINUS_INFINITY (ELSE),
-  whereas an %ADD (linear) variable points to DD_ONE and DD_ZERO.
-
-  @return a pointer to the log variable if successful; NULL otherwise.
-
-  @sideeffect None
-
-  @see Cudd_addIthVar
-
-*/
-DdNode *
-Cudd_addIthLogVar(
-  DdManager * dd,
-  int  i)
-{
-    DdNode *res;
-
-    if ((unsigned int) i >= CUDD_MAXINDEX - 1) {
-        dd->errorCode = CUDD_INVALID_ARG;
-        return(NULL);
-    }
-    do {
-        dd->reordered = 0;
-        res = cuddUniqueInter(dd,i,DD_ZERO(dd),DD_MINUS_INFINITY(dd));
-    } while (dd->reordered == 1);
-    if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
-        dd->timeoutHandler(dd, dd->tohArg);
-    }
-
-    return(res);
-
-} /* end of Cudd_addIthLogVar */
-
-
-/**
   @brief Returns the %ADD variable with index i.
 
   @details Retrieves the %ADD variable with index i if it already
@@ -320,6 +281,51 @@ Cudd_addIthVar(
     return(res);
 
 } /* end of Cudd_addIthVar */
+
+
+/**
+  @brief Returns the %ADD log variable with index i.
+
+  @details Retrieves the %ADD log variable with index i if it already exists,
+  or creates a new %ADD log variable.
+  An %ADD log variable points to DD_ZERO (THEN) and DD_MINUS_INFINITY (ELSE),
+  whereas an %ADD (linear) variable points to DD_ONE and DD_ZERO.
+
+  @return a pointer to the log variable if successful; NULL otherwise.
+
+  @sideeffect None
+
+  @see Cudd_addIthVar
+
+*/
+DdNode *
+Cudd_addIthLogVar(
+  DdManager * dd,
+  int  i,
+  bool positiveLiteral)
+{
+    DdNode *res;
+
+    if ((unsigned int) i >= CUDD_MAXINDEX - 1) {
+        dd->errorCode = CUDD_INVALID_ARG;
+        return(NULL);
+    }
+    do {
+        dd->reordered = 0;
+        if (positiveLiteral) {
+          res = cuddUniqueInter(dd,i,DD_ZERO(dd),DD_MINUS_INFINITY(dd));
+        }
+        else {
+          res = cuddUniqueInter(dd,i,DD_MINUS_INFINITY(dd),DD_ZERO(dd));
+        }
+    } while (dd->reordered == 1);
+    if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
+        dd->timeoutHandler(dd, dd->tohArg);
+    }
+
+    return(res);
+
+} /* end of Cudd_addIthLogVar */
 
 
 /**
