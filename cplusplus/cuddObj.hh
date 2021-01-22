@@ -481,6 +481,7 @@ public:
     BDD bddZero(void) const;
     ADD addVar(void) const;
     ADD addVar(int index) const;
+    ADD addLogVar(int index) const;
     ADD addOne(void) const;
     ADD addZero(void) const;
     ADD constant(CUDD_VALUE_TYPE c) const;

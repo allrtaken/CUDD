@@ -1474,6 +1474,17 @@ Cudd::addVar(
 
 
 ADD
+Cudd::addLogVar(
+  int index) const
+{
+    DdNode *result = Cudd_addIthLogVar(p->manager,index);
+    checkReturnValue(result);
+    return ADD(p, result);
+
+} // Cudd::addLogVar
+
+
+ADD
 Cudd::addOne() const
 {
     DdNode *result = Cudd_ReadOne(p->manager);
