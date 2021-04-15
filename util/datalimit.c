@@ -65,7 +65,7 @@
  * @brief Default value returned if getrlimit not available.
  */
 #ifndef RLIMIT_DATA_DEFAULT
-#define RLIMIT_DATA_DEFAULT 268435456	/* assume 256MB by default */
+#define RLIMIT_DATA_DEFAULT 268435456 /* assume 256MB by default */
 #endif
 
 /**
@@ -74,9 +74,9 @@
  */
 #ifndef EXTERN
 #   ifdef __cplusplus
-#	define EXTERN extern "C"
+#       define EXTERN extern "C"
 #   else
-#	define EXTERN extern
+#       define EXTERN extern
 #   endif
 #endif
 
@@ -93,18 +93,14 @@ getSoftDataLimit(void)
     int result;
 
     result = getrlimit(RLIMIT_DATA, &rl);
-    if (result != 0 || rl.rlim_cur == RLIM_INFINITY)
-	return (size_t) RLIMIT_DATA_DEFAULT;
-    else
-	return (size_t) rl.rlim_cur;
+    if (result != 0 || rl.rlim_cur == RLIM_INFINITY) return (size_t) RLIMIT_DATA_DEFAULT;
+    else return (size_t) rl.rlim_cur;
 #elif defined(_WIN32)
     /* Not quite the same, because this returns available physical memory. */
     MEMORYSTATUSEX statex;
     statex.dwLength = sizeof(statex);
-    if (GlobalMemoryStatusEx(&statex))
-	return (size_t) statex.ullTotalPhys;
-    else
-	return (size_t) RLIMIT_DATA_DEFAULT;
+    if (GlobalMemoryStatusEx(&statex)) return (size_t) statex.ullTotalPhys;
+    else return (size_t) RLIMIT_DATA_DEFAULT;
 #else
     return (size_t) RLIMIT_DATA_DEFAULT;
 #endif
