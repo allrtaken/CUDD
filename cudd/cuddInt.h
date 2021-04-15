@@ -62,67 +62,62 @@
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-#define CUDD_VERSION		PACKAGE_VERSION
+#define CUDD_VERSION PACKAGE_VERSION
 
-#define DD_MAXREF		((DdHalfWord) ~0)
+#define DD_MAXREF ((DdHalfWord) ~0)
 
-#define DD_DEFAULT_RESIZE	10	/* how many extra variables */
-					/* should be added when resizing */
-#define DD_MEM_CHUNK		1022
+#define DD_DEFAULT_RESIZE 10 /* how many extra variables should be added when resizing */
+#define DD_MEM_CHUNK 1022
 
 /* These definitions work for CUDD_VALUE_TYPE == double */
-#define DD_ONE_VAL		(1.0)
-#define DD_ZERO_VAL		(0.0)
-#define DD_EPSILON		(1.0e-12)
+#define DD_ONE_VAL (1.0)
+#define DD_ZERO_VAL (0.0)
+#define DD_EPSILON (1.0e-12)
 
 /* The definitions of +/- infinity in terms of HUGE_VAL work on
 ** the DECstations and on many other combinations of OS/compiler.
 */
 #ifdef HAVE_IEEE_754
-#  define DD_PLUS_INF_VAL	(HUGE_VAL)
+#  define DD_PLUS_INF_VAL (HUGE_VAL)
 #else
-#  define DD_PLUS_INF_VAL	(10e301)
-#  define DD_CRI_HI_MARK	(10e150)
-#  define DD_CRI_LO_MARK	(-(DD_CRI_HI_MARK))
+#  define DD_PLUS_INF_VAL (10e301)
+#  define DD_CRI_HI_MARK (10e150)
+#  define DD_CRI_LO_MARK (-(DD_CRI_HI_MARK))
 #endif
-#define DD_MINUS_INF_VAL	(-(DD_PLUS_INF_VAL))
+#define DD_MINUS_INF_VAL (-(DD_PLUS_INF_VAL))
 
-#define DD_NON_CONSTANT		((DdNode *) 1)	/* for Cudd_bddIteConstant */
+#define DD_NON_CONSTANT ((DdNode *) 1) /* for Cudd_bddIteConstant */
 
 /* Unique table and cache management constants. */
-#define DD_MAX_SUBTABLE_DENSITY 4	/* tells when to resize a subtable */
+#define DD_MAX_SUBTABLE_DENSITY 4 /* tells when to resize a subtable */
 /* gc when this percent are dead (measured w.r.t. slots, not keys)
 ** The first limit (LO) applies normally. The second limit applies when
 ** the package believes more space for the unique table (i.e., more dead
 ** nodes) would improve performance, and the unique table is not already
 ** too large. The third limit applies when memory is low.
 */
-#define DD_GC_FRAC_LO		DD_MAX_SUBTABLE_DENSITY * 0.25
-#define DD_GC_FRAC_HI		DD_MAX_SUBTABLE_DENSITY * 1.0
-#define DD_GC_FRAC_MIN		0.2
-#define DD_MIN_HIT		30	/* resize cache when hit ratio
-					   above this percentage (default) */
-#define DD_MAX_LOOSE_FRACTION	5 /* 1 / (max fraction of memory used for
-				     unique table in fast growth mode) */
-#define DD_MAX_CACHE_FRACTION	3 /* 1 / (max fraction of memory used for
-				     computed table if resizing enabled) */
-#define DD_STASH_FRACTION	64 /* 1 / (fraction of memory set
-				      aside for emergencies) */
+#define DD_GC_FRAC_LO DD_MAX_SUBTABLE_DENSITY * 0.25
+#define DD_GC_FRAC_HI DD_MAX_SUBTABLE_DENSITY * 1.0
+#define DD_GC_FRAC_MIN 0.2
+#define DD_MIN_HIT 30 /* resize cache when hit ratio above this percentage (default) */
+#define DD_MAX_LOOSE_FRACTION 5 /* 1 / (max fraction of memory used for unique table in fast growth mode) */
+#define DD_MAX_CACHE_FRACTION 3 /* 1 / (max fraction of memory used for computed table if resizing enabled) */
+#define DD_STASH_FRACTION 64 /* 1 / (fraction of memory set aside for emergencies) */
 #define DD_MAX_CACHE_TO_SLOTS_RATIO 4 /* used to limit the cache size */
 
 /* Variable ordering default parameter values. */
-#define DD_SIFT_MAX_VAR		1000
-#define DD_SIFT_MAX_SWAPS	2000000
-#define DD_DEFAULT_RECOMB	0
-#define DD_MAX_REORDER_GROWTH	1.2
-#define DD_FIRST_REORDER	4004	/* 4 for the constants */
-#define DD_DYN_RATIO		2	/* when to dynamically reorder */
+#define DD_SIFT_MAX_VAR 1000
+#define DD_SIFT_MAX_SWAPS 2000000
+#define DD_DEFAULT_RECOMB 0
+#define DD_MAX_REORDER_GROWTH 1.2
+#define DD_FIRST_REORDER 4004 /* 4 for the constants */
+#define DD_DYN_RATIO 2 /* when to dynamically reorder */
 
 /* Primes for cache hash functions. */
-#define DD_P1			12582917
-#define DD_P2			4256249
-#define DD_P3			741457
-#define DD_P4			1618033999
+#define DD_P1 12582917
+#define DD_P2 4256249
+#define DD_P3 741457
+#define DD_P4 1618033999
 
 /* Cache tags for 3-operand operators.  These tags are stored in the
 ** least significant bits of the cache operand pointers according to
@@ -136,27 +131,27 @@
 ** entry.  It can by any even digit between 0 and e.  This gives a total
 ** of 5 bits for the tag proper, which means a maximum of 32 three-operand
 ** operations. */
-#define DD_ADD_ITE_TAG				0x02
-#define DD_BDD_AND_ABSTRACT_TAG			0x06
-#define DD_BDD_XOR_EXIST_ABSTRACT_TAG		0x0a
-#define DD_BDD_ITE_TAG				0x0e
-#define DD_ADD_BDD_DO_INTERVAL_TAG		0x22
-#define DD_BDD_CLIPPING_AND_ABSTRACT_UP_TAG	0x26
-#define DD_BDD_CLIPPING_AND_ABSTRACT_DOWN_TAG	0x2a
-#define DD_BDD_COMPOSE_RECUR_TAG		0x2e
-#define DD_ADD_COMPOSE_RECUR_TAG		0x42
-#define DD_ADD_NON_SIM_COMPOSE_TAG		0x46
-#define DD_EQUIV_DC_TAG				0x4a
-#define DD_ZDD_ITE_TAG				0x4e
-#define DD_ADD_ITE_CONSTANT_TAG			0x62
-#define DD_ADD_EVAL_CONST_TAG			0x66
-#define DD_BDD_ITE_CONSTANT_TAG			0x6a
-#define DD_ADD_OUT_SUM_TAG			0x6e
-#define DD_BDD_LEQ_UNLESS_TAG			0x82
-#define DD_ADD_TRIANGLE_TAG			0x86
-#define DD_BDD_MAX_EXP_TAG			0x8a
-#define DD_VARS_SYMM_BEFORE_TAG			0x8e
-#define DD_VARS_SYMM_BETWEEN_TAG		0xa2
+#define DD_ADD_ITE_TAG 0x02
+#define DD_BDD_AND_ABSTRACT_TAG 0x06
+#define DD_BDD_XOR_EXIST_ABSTRACT_TAG 0x0a
+#define DD_BDD_ITE_TAG 0x0e
+#define DD_ADD_BDD_DO_INTERVAL_TAG 0x22
+#define DD_BDD_CLIPPING_AND_ABSTRACT_UP_TAG 0x26
+#define DD_BDD_CLIPPING_AND_ABSTRACT_DOWN_TAG 0x2a
+#define DD_BDD_COMPOSE_RECUR_TAG 0x2e
+#define DD_ADD_COMPOSE_RECUR_TAG 0x42
+#define DD_ADD_NON_SIM_COMPOSE_TAG 0x46
+#define DD_EQUIV_DC_TAG 0x4a
+#define DD_ZDD_ITE_TAG 0x4e
+#define DD_ADD_ITE_CONSTANT_TAG 0x62
+#define DD_ADD_EVAL_CONST_TAG 0x66
+#define DD_BDD_ITE_CONSTANT_TAG 0x6a
+#define DD_ADD_OUT_SUM_TAG 0x6e
+#define DD_BDD_LEQ_UNLESS_TAG 0x82
+#define DD_ADD_TRIANGLE_TAG 0x86
+#define DD_BDD_MAX_EXP_TAG 0x8a
+#define DD_VARS_SYMM_BEFORE_TAG 0x8e
+#define DD_VARS_SYMM_BETWEEN_TAG 0xa2
 
 /* Generator constants. */
 #define CUDD_GEN_CUBES 0
@@ -174,9 +169,9 @@
  ** a negative number.
  */
 #if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
-#define CUDD_MAXINDEX		(((DdHalfWord) ~0) >> 1)
+#define CUDD_MAXINDEX (((DdHalfWord) ~0) >> 1)
 #else
-#define CUDD_MAXINDEX		((DdHalfWord) ~0)
+#define CUDD_MAXINDEX ((DdHalfWord) ~0)
 #endif
 
 /**
@@ -184,7 +179,7 @@
  **
  ** @details This is a synonim for CUDD_MAXINDEX.
  */
-#define CUDD_CONST_INDEX	CUDD_MAXINDEX
+#define CUDD_CONST_INDEX CUDD_MAXINDEX
 
 /**
  ** @brief Size of the random number generator shuffle table.
@@ -251,48 +246,48 @@ typedef struct DdLevelQueue DdLevelQueue;
  * @brief The two children of a non-terminal node.
  */
 struct DdChildren {
-    struct DdNode *T;	/**< then (true) child */
-    struct DdNode *E;	/**< else (false) child */
+    struct DdNode *T; /**< then (true) child */
+    struct DdNode *E; /**< else (false) child */
 };
 
 /**
  * @brief Decision diagram node.
  */
 struct DdNode {
-    DdHalfWord index;		/**< variable index */
-    DdHalfWord ref;		/**< reference count */
-    DdNode *next;		/**< next pointer for unique table */
+    DdHalfWord index; /**< variable index */
+    DdHalfWord ref; /**< reference count */
+    DdNode *next; /**< next pointer for unique table */
     union {
-	CUDD_VALUE_TYPE value;	/**< for constant (terminal) nodes */
-	DdChildren kids;	/**< for internal nodes */
-    } type;			/**< terminal or internal */
+        CUDD_VALUE_TYPE value; /**< for constant (terminal) nodes */
+        DdChildren kids; /**< for internal nodes */
+    } type; /**< terminal or internal */
 };
 
 /**
  * @brief CUDD generator.
  */
 struct DdGen {
-    DdManager	*manager;
-    int		type;
-    int		status;
+    DdManager *manager;
+    int type;
+    int status;
     union {
-	struct {
-	    int			*cube;
-	    CUDD_VALUE_TYPE	value;
-	} cubes;
-	struct {
-	    int			*cube;
-	    DdNode		*ub;
-	} primes;
-	struct {
-	    int                 size;
-	} nodes;
+        struct {
+            int *cube;
+            CUDD_VALUE_TYPE value;
+        } cubes;
+        struct {
+            int *cube;
+            DdNode *ub;
+        } primes;
+        struct {
+            int                 size;
+        } nodes;
     } gen;
     struct {
-	int	sp;
-	DdNode	**stack;
+        int sp;
+        DdNode **stack;
     } stack;
-    DdNode	*node;
+    DdNode *node;
 };
 
 /**
@@ -304,8 +299,8 @@ struct DdGen {
  ** successful and 0 otherwise.
  */
 struct DdHook {
-    DD_HFP f;			/**< function to be called */
-    struct DdHook *next;	/**< next element in the list */
+    DD_HFP f; /**< function to be called */
+    struct DdHook *next; /**< next element in the list */
 };
 
 /**
@@ -340,37 +335,37 @@ struct DdLocalCache {
  *  @brief Local hash table item.
  */
 struct DdHashItem {
-    struct DdHashItem *next;	/**< collision list link */
-    ptrint count;		/**< reference count of item */
-    DdNode *value;		/**< value %DD */
-    DdNode *key[1];		/**< key pointers */
+    struct DdHashItem *next; /**< collision list link */
+    ptrint count; /**< reference count of item */
+    DdNode *value; /**< value %DD */
+    DdNode *key[1]; /**< key pointers */
 };
 
 /**
  * @brief Local hash table.
  */
 struct DdHashTable {
-    unsigned int keysize;	/**< number of pointers in the key */
-    unsigned int itemsize;	/**< size of hash table item in bytes */
-    DdHashItem **bucket;	/**< array of buckets */
-    DdHashItem *nextFree;	/**< item free list */
-    DdHashItem **memoryList;	/**< list of memory blocks for items */
-    unsigned int numBuckets;	/**< number of buckets in array */
-    int shift;			/**< shift used in hash function */
-    unsigned int size;		/**< number of items stored in table */
-    unsigned int maxsize;	/**< threshold for table resizing */
-    DdManager *manager;		/**< %DD manager */
+    unsigned int keysize; /**< number of pointers in the key */
+    unsigned int itemsize; /**< size of hash table item in bytes */
+    DdHashItem **bucket; /**< array of buckets */
+    DdHashItem *nextFree; /**< item free list */
+    DdHashItem **memoryList; /**< list of memory blocks for items */
+    unsigned int numBuckets; /**< number of buckets in array */
+    int shift; /**< shift used in hash function */
+    unsigned int size; /**< number of items stored in table */
+    unsigned int maxsize; /**< threshold for table resizing */
+    DdManager *manager; /**< %DD manager */
 };
 
 /**
  *  @brief Computed table.
  */
 struct DdCache {
-    DdNode *f,*g;		/**< DDs */
-    ptruint h;			/**< either operator or %DD */
-    DdNode *data;		/**< already constructed %DD */
+    DdNode *f,*g; /**< DDs */
+    ptruint h; /**< either operator or %DD */
+    DdNode *data; /**< already constructed %DD */
 #ifdef DD_CACHE_PROFILE
-    ptrint count;		/**< statistical counter */
+    ptrint count; /**< statistical counter */
 #endif
 };
 
@@ -378,18 +373,18 @@ struct DdCache {
  *  @brief Subtable for one index.
  */
 struct DdSubtable {
-    DdNode **nodelist;		/**< hash table */
-    int shift;			/**< shift for hash function */
-    unsigned int slots;		/**< size of the hash table */
-    unsigned int keys;		/**< number of nodes stored in this table */
-    unsigned int maxKeys;	/**< slots * DD_MAX_SUBTABLE_DENSITY */
-    unsigned int dead;		/**< number of dead nodes in this table */
-    unsigned int next;		/**< index of next variable in group */
-    int bindVar;		/**< flag to bind this variable to its level */
+    DdNode **nodelist; /**< hash table */
+    int shift; /**< shift for hash function */
+    unsigned int slots; /**< size of the hash table */
+    unsigned int keys; /**< number of nodes stored in this table */
+    unsigned int maxKeys; /**< slots * DD_MAX_SUBTABLE_DENSITY */
+    unsigned int dead; /**< number of dead nodes in this table */
+    unsigned int next; /**< index of next variable in group */
+    int bindVar; /**< flag to bind this variable to its level */
     /* Fields for lazy sifting. */
     Cudd_VariableType varType;  /**< variable type (ps, ns, pi) */
     int pairIndex;              /**< corresponding variable index (ps <-> ns) */
-    int varHandled;		/**< flag: 1 means variable is already handled */
+    int varHandled; /**< flag: 1 means variable is already handled */
     Cudd_LazyGroupType varToBeGrouped; /**< tells what grouping to apply */
 };
 
@@ -398,166 +393,164 @@ struct DdSubtable {
  */
 struct DdManager {
     /* Constants */
-    DdNode sentinel;		/**< for collision lists */
-    DdNode *one;		/**< constant 1 */
-    DdNode *zero;		/**< constant 0 */
-    DdNode *plusinfinity;	/**< plus infinity */
-    DdNode *minusinfinity;	/**< minus infinity */
-    DdNode *background;		/**< background value */
+    DdNode sentinel; /**< for collision lists */
+    DdNode *one; /**< constant 1 */
+    DdNode *zero; /**< constant 0 */
+    DdNode *plusinfinity; /**< plus infinity */
+    DdNode *minusinfinity; /**< minus infinity */
+    DdNode *background; /**< background value */
     /* Computed Table */
-    DdCache *acache;		/**< address of allocated memory for cache */
-    DdCache *cache;		/**< the cache-based computed table */
-    unsigned int cacheSlots;	/**< total number of cache entries */
-    int cacheShift;		/**< shift value for cache hash function */
-    double cacheMisses;		/**< number of cache misses (since resizing) */
-    double cacheHits;		/**< number of cache hits (since resizing) */
-    double minHit;		/**< hit percentage above which to resize */
-    int cacheSlack;		/**< slots still available for resizing */
-    unsigned int maxCacheHard;	/**< hard limit for cache size */
+    DdCache *acache; /**< address of allocated memory for cache */
+    DdCache *cache; /**< the cache-based computed table */
+    unsigned int cacheSlots; /**< total number of cache entries */
+    int cacheShift; /**< shift value for cache hash function */
+    double cacheMisses; /**< number of cache misses (since resizing) */
+    double cacheHits; /**< number of cache hits (since resizing) */
+    double minHit; /**< hit percentage above which to resize */
+    int cacheSlack; /**< slots still available for resizing */
+    unsigned int maxCacheHard; /**< hard limit for cache size */
     /* Unique Table */
-    int size;			/**< number of unique subtables */
-    int sizeZ;			/**< for %ZDD */
-    int maxSize;		/**< max number of subtables before resizing */
-    int maxSizeZ;		/**< for %ZDD */
-    DdSubtable *subtables;	/**< array of unique subtables */
-    DdSubtable *subtableZ;	/**< for %ZDD */
-    DdSubtable constants;	/**< unique subtable for the constants */
-    unsigned int slots;		/**< total number of hash buckets */
-    unsigned int keys;		/**< total number of %BDD and %ADD nodes */
-    unsigned int keysZ;		/**< total number of %ZDD nodes */
-    unsigned int dead;		/**< total number of dead %BDD and %ADD nodes */
-    unsigned int deadZ;		/**< total number of dead %ZDD nodes */
-    unsigned int maxLive;	/**< maximum number of live nodes */
-    unsigned int minDead;	/**< do not GC if fewer than these dead */
-    int gcEnabled;		/**< gc is enabled */
-    double gcFrac;		/**< gc when this fraction is dead */
-    unsigned int looseUpTo;	/**< slow growth beyond this limit */
-				/**< (measured w.r.t. slots, not keys) */
-    unsigned int initSlots;	/**< initial size of a subtable */
-    DdNode **stack;		/**< stack for iterative procedures */
-    double allocated;		/**< number of nodes allocated */
-				/**< (not during reordering) */
-    double reclaimed;		/**< number of nodes brought back from the dead */
-    int *perm;			/**< current variable perm. (index to level) */
-    int *permZ;			/**< for %ZDD */
-    int *invperm;		/**< current inv. var. perm. (level to index) */
-    int *invpermZ;		/**< for %ZDD */
-    DdNode **vars;		/**< projection functions */
-    int *map;			/**< variable map for fast swap */
-    DdNode **univ;		/**< %ZDD 1 for each variable */
-    unsigned int isolated;	/**< isolated projection functions */
-    unsigned int originalSize;	/**< used by lazy sifting */
-    int linearSize;		/**< number of rows and columns of linear */
-    ptruint *interact;		/**< interacting variable matrix */
-    ptruint *linear;		/**< linear transform matrix */
+    int size; /**< number of unique subtables */
+    int sizeZ; /**< for %ZDD */
+    int maxSize; /**< max number of subtables before resizing */
+    int maxSizeZ; /**< for %ZDD */
+    DdSubtable *subtables; /**< array of unique subtables */
+    DdSubtable *subtableZ; /**< for %ZDD */
+    DdSubtable constants; /**< unique subtable for the constants */
+    unsigned int slots; /**< total number of hash buckets */
+    unsigned int keys; /**< total number of %BDD and %ADD nodes */
+    unsigned int keysZ; /**< total number of %ZDD nodes */
+    unsigned int dead; /**< total number of dead %BDD and %ADD nodes */
+    unsigned int deadZ; /**< total number of dead %ZDD nodes */
+    unsigned int maxLive; /**< maximum number of live nodes */
+    unsigned int minDead; /**< do not GC if fewer than these dead */
+    int gcEnabled; /**< gc is enabled */
+    double gcFrac; /**< gc when this fraction is dead */
+    unsigned int looseUpTo; /**< slow growth beyond this limit (measured w.r.t. slots, not keys) */
+    unsigned int initSlots; /**< initial size of a subtable */
+    DdNode **stack; /**< stack for iterative procedures */
+    double allocated; /**< number of nodes allocated (not during reordering) */
+    double reclaimed; /**< number of nodes brought back from the dead */
+    int *perm; /**< current variable perm. (index to level) */
+    int *permZ; /**< for %ZDD */
+    int *invperm; /**< current inv. var. perm. (level to index) */
+    int *invpermZ; /**< for %ZDD */
+    DdNode **vars; /**< projection functions */
+    int *map; /**< variable map for fast swap */
+    DdNode **univ; /**< %ZDD 1 for each variable */
+    unsigned int isolated; /**< isolated projection functions */
+    unsigned int originalSize; /**< used by lazy sifting */
+    int linearSize; /**< number of rows and columns of linear */
+    ptruint *interact; /**< interacting variable matrix */
+    ptruint *linear; /**< linear transform matrix */
     /* Memory Management */
-    DdNode **memoryList;	/**< memory manager for symbol table */
-    DdNode *nextFree;		/**< list of free nodes */
-    char *stash;		/**< memory reserve */
+    DdNode **memoryList; /**< memory manager for symbol table */
+    DdNode *nextFree; /**< list of free nodes */
+    char *stash; /**< memory reserve */
 #ifndef DD_NO_DEATH_ROW
-    DdNode **deathRow;		/**< queue for dereferencing */
-    int deathRowDepth;		/**< number of slots in the queue */
-    int nextDead;		/**< index in the queue */
-    unsigned deadMask;		/**< mask for circular index update */
+    DdNode **deathRow; /**< queue for dereferencing */
+    int deathRowDepth; /**< number of slots in the queue */
+    int nextDead; /**< index in the queue */
+    unsigned deadMask; /**< mask for circular index update */
 #endif
     /* General Parameters */
-    CUDD_VALUE_TYPE epsilon;	/**< tolerance on comparisons */
+    CUDD_VALUE_TYPE epsilon; /**< tolerance on comparisons */
     /* Dynamic Reordering Parameters */
-    int reordered;		/**< flag set at the end of reordering */
-    unsigned int reorderings;	/**< number of calls to Cudd_ReduceHeap */
+    int reordered; /**< flag set at the end of reordering */
+    unsigned int reorderings; /**< number of calls to Cudd_ReduceHeap */
     unsigned int maxReorderings;/**< maximum number of calls to Cudd_ReduceHeap */
-    int siftMaxVar;		/**< maximum number of vars sifted */
-    int siftMaxSwap;		/**< maximum number of swaps per sifting */
+    int siftMaxVar; /**< maximum number of vars sifted */
+    int siftMaxSwap; /**< maximum number of swaps per sifting */
     int ddTotalNumberSwapping;  /**< number of %BDD/%ADD swaps completed */
     int zddTotalNumberSwapping; /**< number of %ZDD swaps completed */
-    int reordCycle;		/**< how often to apply alternate threshold */
-    double maxGrowth;		/**< maximum growth during reordering */
-    double maxGrowthAlt;	/**< alternate maximum growth for reordering */
-    int autoDyn;		/**< automatic dynamic reordering flag (BDD) */
-    int autoDynZ;		/**< automatic dynamic reordering flag (ZDD) */
+    int reordCycle; /**< how often to apply alternate threshold */
+    double maxGrowth; /**< maximum growth during reordering */
+    double maxGrowthAlt; /**< alternate maximum growth for reordering */
+    int autoDyn; /**< automatic dynamic reordering flag (BDD) */
+    int autoDynZ; /**< automatic dynamic reordering flag (ZDD) */
     Cudd_ReorderingType autoMethod;  /**< default reordering method */
     Cudd_ReorderingType autoMethodZ; /**< default reordering method (ZDD) */
-    int realign;		/**< realign %ZDD order after %BDD reordering */
-    int realignZ;		/**< realign %BDD order after %ZDD reordering */
-    unsigned int nextDyn;	/**< reorder if this size is reached */
-    unsigned int countDead;	/**< if 0, count deads to trigger reordering */
-    MtrNode *tree;		/**< variable group tree (BDD) */
-    MtrNode *treeZ;		/**< variable group tree (ZDD) */
+    int realign; /**< realign %ZDD order after %BDD reordering */
+    int realignZ; /**< realign %BDD order after %ZDD reordering */
+    unsigned int nextDyn; /**< reorder if this size is reached */
+    unsigned int countDead; /**< if 0, count deads to trigger reordering */
+    MtrNode *tree; /**< variable group tree (BDD) */
+    MtrNode *treeZ; /**< variable group tree (ZDD) */
     Cudd_AggregationType groupcheck; /**< used during group sifting */
-    int recomb;			/**< used during group sifting */
-    int symmviolation;		/**< used during group sifting */
-    int arcviolation;		/**< used during group sifting */
-    int populationSize;		/**< population size for GA */
-    int	numberXovers;		/**< number of crossovers for GA */
+    int recomb; /**< used during group sifting */
+    int symmviolation; /**< used during group sifting */
+    int arcviolation; /**< used during group sifting */
+    int populationSize; /**< population size for GA */
+    int numberXovers; /**< number of crossovers for GA */
     unsigned int randomizeOrder; /**< perturb the next reordering threshold */
-    DdLocalCache *localCaches;	/**< local caches currently in existence */
-    void *hooks;		/**< application-specific field (used by vis) */
-    DdHook *preGCHook;		/**< hooks to be called before GC */
-    DdHook *postGCHook;		/**< hooks to be called after GC */
-    DdHook *preReorderingHook;	/**< hooks to be called before reordering */
-    DdHook *postReorderingHook;	/**< hooks to be called after reordering */
-    FILE *out;			/**< stdout for this manager */
-    FILE *err;			/**< stderr for this manager */
-    Cudd_ErrorType errorCode;	/**< info on last error */
-    unsigned long startTime;	/**< start time in milliseconds */
-    unsigned long timeLimit;	/**< CPU time limit */
+    DdLocalCache *localCaches; /**< local caches currently in existence */
+    void *hooks; /**< application-specific field (used by vis) */
+    DdHook *preGCHook; /**< hooks to be called before GC */
+    DdHook *postGCHook; /**< hooks to be called after GC */
+    DdHook *preReorderingHook; /**< hooks to be called before reordering */
+    DdHook *postReorderingHook; /**< hooks to be called after reordering */
+    FILE *out; /**< stdout for this manager */
+    FILE *err; /**< stderr for this manager */
+    Cudd_ErrorType errorCode; /**< info on last error */
+    unsigned long startTime; /**< start time in milliseconds */
+    unsigned long timeLimit; /**< CPU time limit */
     DD_THFP terminationCallback; /**< termination callback */
-    void * tcbArg;		/**< second argument passed to termination handler */
-    DD_OOMFP outOfMemCallback;	/**< out-of-memory callback */
-    DD_TOHFP timeoutHandler;	/**< timeout handler */
-    void * tohArg;		/**< second argument passed to timeout handler */
+    void * tcbArg; /**< second argument passed to termination handler */
+    DD_OOMFP outOfMemCallback; /**< out-of-memory callback */
+    DD_TOHFP timeoutHandler; /**< timeout handler */
+    void * tohArg; /**< second argument passed to timeout handler */
     /* Statistical counters. */
-    size_t memused;		/**< total memory allocated for the manager */
-    size_t maxmem;		/**< target maximum memory */
-    size_t maxmemhard;		/**< hard limit for maximum memory */
-    int garbageCollections;	/**< number of garbage collections */
-    unsigned long GCTime;	/**< total time spent in garbage collection */
-    unsigned long reordTime;	/**< total time spent in reordering */
-    double totCachehits;	/**< total number of cache hits */
-    double totCacheMisses;	/**< total number of cache misses */
-    double cachecollisions;	/**< number of cache collisions */
-    double cacheinserts;	/**< number of cache insertions */
-    double cacheLastInserts;	/**< insertions at the last cache resizing */
-    double cachedeletions;	/**< number of deletions during garbage coll. */
-    unsigned int peakLiveNodes;	/**< maximum number of live nodes */
+    size_t memused; /**< total memory allocated for the manager */
+    size_t maxmem; /**< target maximum memory */
+    size_t maxmemhard; /**< hard limit for maximum memory */
+    int garbageCollections; /**< number of garbage collections */
+    unsigned long GCTime; /**< total time spent in garbage collection */
+    unsigned long reordTime; /**< total time spent in reordering */
+    double totCachehits; /**< total number of cache hits */
+    double totCacheMisses; /**< total number of cache misses */
+    double cachecollisions; /**< number of cache collisions */
+    double cacheinserts; /**< number of cache insertions */
+    double cacheLastInserts; /**< insertions at the last cache resizing */
+    double cachedeletions; /**< number of deletions during garbage coll. */
+    unsigned int peakLiveNodes; /**< maximum number of live nodes */
     /* Random number generator. */
-    int32_t cuddRand;		/**< state of the random number generator */
-    int32_t cuddRand2;		/**< state of the random number generator */
-    int32_t shuffleSelect;	/**< state of the random number generator */
+    int32_t cuddRand; /**< state of the random number generator */
+    int32_t cuddRand2; /**< state of the random number generator */
+    int32_t shuffleSelect; /**< state of the random number generator */
     int32_t shuffleTable[STAB_SIZE]; /**< state of the random number generator */
 #ifdef DD_STATS
-    double nodesFreed;		/**< number of nodes returned to the free list */
-    double nodesDropped;	/**< number of nodes killed by dereferencing */
-    int	totalNISwaps;		/**< number of non-interacting (cheap) swaps */
-    int extsymmcalls;		/**< number of calls to symmetry check fn */
-    int extsymm;		/**< number of successful symmetry checks */
-    int secdiffcalls;		/**< number of calls to second difference fn */
-    int secdiff;		/**< number of successful second diff. checks */
-    int secdiffmisfire;		/**< number of misfired second diff. checks */
-    int tosses;			/**< number of coin tosses in annealing */
-    int acceptances;		/**< number of acceptances in annealing */
-    int totalShuffles;		/**< number of shuffles in exact reordering */
-    int totalNumberLinearTr;	/**< number of linear transformations */
-    int num_calls;		/**< should equal 2n-1 (n is the # of nodes) */
+    double nodesFreed; /**< number of nodes returned to the free list */
+    double nodesDropped; /**< number of nodes killed by dereferencing */
+    int totalNISwaps; /**< number of non-interacting (cheap) swaps */
+    int extsymmcalls; /**< number of calls to symmetry check fn */
+    int extsymm; /**< number of successful symmetry checks */
+    int secdiffcalls; /**< number of calls to second difference fn */
+    int secdiff; /**< number of successful second diff. checks */
+    int secdiffmisfire; /**< number of misfired second diff. checks */
+    int tosses; /**< number of coin tosses in annealing */
+    int acceptances; /**< number of acceptances in annealing */
+    int totalShuffles; /**< number of shuffles in exact reordering */
+    int totalNumberLinearTr; /**< number of linear transformations */
+    int num_calls; /**< should equal 2n-1 (n is the # of nodes) */
 #endif
 #ifdef DD_UNIQUE_PROFILE
-    double uniqueLookUps;	/**< number of unique table lookups */
-    double uniqueLinks;		/**< total distance traveled in coll. chains */
+    double uniqueLookUps; /**< number of unique table lookups */
+    double uniqueLinks; /**< total distance traveled in coll. chains */
 #endif
 #ifdef DD_COUNT
-    double recursiveCalls;	/**< number of recursive calls */
+    double recursiveCalls; /**< number of recursive calls */
 #ifdef DD_STATS
-    double nextSample;		/**< when to write next line of stats */
+    double nextSample; /**< when to write next line of stats */
 #endif
-    double swapSteps;		/**< number of elementary reordering steps */
+    double swapSteps; /**< number of elementary reordering steps */
 #endif
 #ifdef DD_DEBUG
-    int addPermuteRecurHits;	/**< debug variable for variable permutation */
-    int bddPermuteRecurHits;	/**< debug variable for variable permutation */
-    int bddVectorComposeHits;	/**< debug variable for vector composition */
-    int addVectorComposeHits;	/**< debug variable for vector composition */
+    int addPermuteRecurHits; /**< debug variable for variable permutation */
+    int bddPermuteRecurHits; /**< debug variable for variable permutation */
+    int bddVectorComposeHits; /**< debug variable for vector composition */
+    int addVectorComposeHits; /**< debug variable for vector composition */
     int addGeneralVectorComposeHits; /**< debug var. for vector composition */
-    int enableExtraDebug;	/**< deposit a 1 here to enable more debugging */
+    int enableExtraDebug; /**< deposit a 1 here to enable more debugging */
 #endif
 };
 
@@ -788,7 +781,7 @@ struct DdLevelQueue {
 /**
   @brief Hash function for the unique table.
 
-  @details 
+  @details
 
   @sideeffect none
 
@@ -937,7 +930,7 @@ struct DdLevelQueue {
   @see DD_ZERO DD_PLUS_INFINITY DD_MINUS_INFINITY
 
 */
-#define DD_ONE(dd)		((dd)->one)
+#define DD_ONE(dd) ((dd)->one)
 
 
 /**
@@ -993,7 +986,7 @@ struct DdLevelQueue {
 #ifdef HAVE_IEEE_754
 #define cuddAdjust(x)
 #else
-#define cuddAdjust(x)		((x) = ((x) >= DD_CRI_HI_MARK) ? DD_PLUS_INF_VAL : (((x) <= DD_CRI_LO_MARK) ? DD_MINUS_INF_VAL : (x)))
+#define cuddAdjust(x) ((x) = ((x) >= DD_CRI_HI_MARK) ? DD_PLUS_INF_VAL : (((x) <= DD_CRI_LO_MARK) ? DD_MINUS_INF_VAL : (x)))
 #endif
 
 
