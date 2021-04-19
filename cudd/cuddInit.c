@@ -120,7 +120,8 @@ Cudd_Init(
     looseUpTo = (unsigned int) ((maxMemory / sizeof(DdNode)) / DD_MAX_LOOSE_FRACTION);
     unique = cuddInitTable(numVars,numVarsZ,numSlots,looseUpTo);
     if (unique == NULL) return(NULL);
-    unique->maxmem = (size_t) maxMemory / 10 * 9;
+    unique->maxmem = maxMemory / 10 * 9;
+    unique->maxmemhard = maxMemory;
     maxCacheSize = (unsigned int) ((maxMemory / sizeof(DdCache)) / DD_MAX_CACHE_FRACTION);
     result = cuddInitCache(unique,cacheSize,maxCacheSize);
     if (result == 0) return(NULL);
