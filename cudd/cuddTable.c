@@ -205,6 +205,19 @@ Cudd_Reserve(
 
 
 /**
+  @brief Prints and returns the memory used by the manager, in bytes.
+
+*/
+size_t
+printMemUse(
+  const DdManager * unique)
+{
+    printf("c cuddUsedBytes_%ld %ld\n", unique->threadIndex + 1, unique->memused);
+    return unique->memused;
+}
+
+
+/**
   @brief Fast storage allocation for DdNodes in the table.
 
   @details The first 4 bytes of a chunk contain a pointer to the next
@@ -243,6 +256,7 @@ cuddAllocNode(
             return(NULL);
         }
         if (unique->stash == NULL || unique->memused > unique->maxmemhard) {
+            printMemUse(unique);
             (void) cuddGarbageCollect(unique,1);
             mem = NULL;
         }
@@ -1519,6 +1533,7 @@ cuddRehash(
     }
 
     if (unique->gcFrac != DD_GC_FRAC_MIN && unique->memused > unique->maxmem) {
+        printMemUse(unique);
         unique->gcFrac = DD_GC_FRAC_MIN;
         unique->minDead = (unsigned) (DD_GC_FRAC_MIN * (double) unique->slots);
         #ifdef DD_VERBOSE
