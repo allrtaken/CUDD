@@ -3178,7 +3178,7 @@ Cudd_ReadMemoryInUse(
 
 */
 size_t
-Cudd_SetMemoryInUse(
+Cudd_SetMemUse(
   DdManager * dd,
   size_t memUse)
 {
@@ -3187,7 +3187,7 @@ Cudd_SetMemoryInUse(
     dd->memused = memUse;
     return oldUse;
 
-} /* end of Cudd_SetMemoryInUse */
+} /* end of Cudd_SetMemUse */
 
 
 /**

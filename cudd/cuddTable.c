@@ -307,7 +307,7 @@ cuddAllocNode(
             if (mem != NULL) { /* successful allocation; slice memory */
                 ptruint offset;
                 // unique->memused += (DD_MEM_CHUNK + 1) * sizeof(DdNode);
-                Cudd_SetMemoryInUse(unique, unique->memused + (DD_MEM_CHUNK + 1) * sizeof(DdNode));
+                Cudd_SetMemUse(unique, unique->memused + (DD_MEM_CHUNK + 1) * sizeof(DdNode));
                 mem[0] = (DdNodePtr) unique->memoryList;
                 unique->memoryList = mem;
 
@@ -558,10 +558,10 @@ cuddInitTable(
     unique->nextFree = NULL;
 
     // unique->memused = sizeof(DdManager) + (unique->maxSize + unique->maxSizeZ) * (sizeof(DdSubtable) + 2 * sizeof(int)) + (numVars + 1) * slots * sizeof(DdNodePtr) + (ddMax(unique->maxSize,unique->maxSizeZ) + 1) * sizeof(DdNodePtr);
-    Cudd_SetMemoryInUse(unique, sizeof(DdManager) + (unique->maxSize + unique->maxSizeZ) * (sizeof(DdSubtable) + 2 * sizeof(int)) + (numVars + 1) * slots * sizeof(DdNodePtr) + (ddMax(unique->maxSize,unique->maxSizeZ) + 1) * sizeof(DdNodePtr));
+    Cudd_SetMemUse(unique, sizeof(DdManager) + (unique->maxSize + unique->maxSizeZ) * (sizeof(DdSubtable) + 2 * sizeof(int)) + (numVars + 1) * slots * sizeof(DdNodePtr) + (ddMax(unique->maxSize,unique->maxSizeZ) + 1) * sizeof(DdNodePtr));
     #ifndef DD_NO_DEATH_ROW
     // unique->memused += unique->deathRowDepth * sizeof(DdNodePtr);
-    Cudd_SetMemoryInUse(unique, unique->memused + unique->deathRowDepth * sizeof(DdNodePtr));
+    Cudd_SetMemUse(unique, unique->memused + unique->deathRowDepth * sizeof(DdNodePtr));
     #endif
 
     /* Initialize fields concerned with automatic dynamic reordering. */
@@ -1661,7 +1661,7 @@ cuddRehash(
     /* Update global data */
 
     // unique->memused += (slots - oldslots) * sizeof(DdNodePtr);
-    Cudd_SetMemoryInUse(unique, unique->memused + (slots - oldslots) * sizeof(DdNodePtr));
+    Cudd_SetMemUse(unique, unique->memused + (slots - oldslots) * sizeof(DdNodePtr));
     unique->slots += (slots - oldslots);
     ddFixLimits(unique);
 
@@ -1741,7 +1741,7 @@ cuddShrinkSubtable(
     FREE(oldnodelist);
 
     // unique->memused += ((long) slots - (long) oldslots) * sizeof(DdNode *);
-    Cudd_SetMemoryInUse(unique, unique->memused + ((long) slots - (long) oldslots) * sizeof(DdNode *));
+    Cudd_SetMemUse(unique, unique->memused + ((long) slots - (long) oldslots) * sizeof(DdNode *));
     unique->slots += slots - oldslots;
     unique->minDead = (unsigned) (unique->gcFrac * (double) unique->slots);
     unique->cacheSlack = (int) ddMin(unique->maxCacheHard,DD_MAX_CACHE_TO_SLOTS_RATIO * unique->slots) - 2 * (int) unique->cacheSlots;
@@ -1877,10 +1877,10 @@ cuddInsertSubtables(
                 return(0);
             }
             // unique->memused += (newsize - unique->maxSize) * sizeof(int);
-            Cudd_SetMemoryInUse(unique, unique->memused + (newsize - unique->maxSize) * sizeof(int));
+            Cudd_SetMemUse(unique, unique->memused + (newsize - unique->maxSize) * sizeof(int));
         }
         // unique->memused += (newsize - unique->maxSize) * ((numSlots+1) * sizeof(DdNode *) + 2 * sizeof(int) + sizeof(DdSubtable));
-        Cudd_SetMemoryInUse(unique, unique->memused + (newsize - unique->maxSize) * ((numSlots+1) * sizeof(DdNode *) + 2 * sizeof(int) + sizeof(DdSubtable)));
+        Cudd_SetMemUse(unique, unique->memused + (newsize - unique->maxSize) * ((numSlots+1) * sizeof(DdNode *) + 2 * sizeof(int) + sizeof(DdSubtable)));
         /* Copy levels before insertion points from old tables. */
         for (i = 0; i < level; i++) {
             newsubtables[i].slots = unique->subtables[i].slots;
@@ -1977,7 +1977,7 @@ cuddInsertSubtables(
             }
             unique->stack[0] = NULL; /* to suppress harmless UMR */
             // unique->memused += (newsize - ddMax(unique->maxSize,unique->maxSizeZ)) * sizeof(DdNode *);
-            Cudd_SetMemoryInUse(unique, unique->memused + (newsize - ddMax(unique->maxSize,unique->maxSizeZ)) * sizeof(DdNode *));
+            Cudd_SetMemUse(unique, unique->memused + (newsize - ddMax(unique->maxSize,unique->maxSizeZ)) * sizeof(DdNode *));
         }
     }
     /* Update manager parameters to account for the new subtables. */
@@ -2122,7 +2122,7 @@ cuddDestroySubtables(
         #endif
         FREE(nodelist);
         // unique->memused -= sizeof(DdNodePtr) * subtables[level].slots;
-        Cudd_SetMemoryInUse(unique, unique->memused - sizeof(DdNodePtr) * subtables[level].slots);
+        Cudd_SetMemUse(unique, unique->memused - sizeof(DdNodePtr) * subtables[level].slots);
         unique->slots -= subtables[level].slots;
         unique->dead -= subtables[level].dead;
     }
@@ -2246,7 +2246,7 @@ cuddResizeTableZdd(
             return(0);
         }
         // unique->memused += (newsize - unique->maxSizeZ) * ((numSlots+1) * sizeof(DdNode *) + 2 * sizeof(int) + sizeof(DdSubtable));
-        Cudd_SetMemoryInUse(unique, unique->memused + (newsize - unique->maxSizeZ) * ((numSlots+1) * sizeof(DdNode *) + 2 * sizeof(int) + sizeof(DdSubtable)));
+        Cudd_SetMemUse(unique, unique->memused + (newsize - unique->maxSizeZ) * ((numSlots+1) * sizeof(DdNode *) + 2 * sizeof(int) + sizeof(DdSubtable)));
         if (newsize > unique->maxSize) {
             FREE(unique->stack);
             unique->stack = ALLOC(DdNodePtr,newsize + 1);
@@ -2256,7 +2256,7 @@ cuddResizeTableZdd(
             }
             unique->stack[0] = NULL; /* to suppress harmless UMR */
             // unique->memused += (newsize - ddMax(unique->maxSize,unique->maxSizeZ)) * sizeof(DdNode *);
-            Cudd_SetMemoryInUse(unique, unique->memused + (newsize - ddMax(unique->maxSize,unique->maxSizeZ)) * sizeof(DdNode *));
+            Cudd_SetMemUse(unique, unique->memused + (newsize - ddMax(unique->maxSize,unique->maxSizeZ)) * sizeof(DdNode *));
         }
         for (i = 0; i < oldsize; i++) {
             newsubtables[i].slots = unique->subtableZ[i].slots;
@@ -2428,7 +2428,7 @@ ddRehashZdd(
 
     /* Update global data. */
     // unique->memused += (slots - oldslots) * sizeof(DdNode *);
-    Cudd_SetMemoryInUse(unique, unique->memused + (slots - oldslots) * sizeof(DdNode *));
+    Cudd_SetMemUse(unique, unique->memused + (slots - oldslots) * sizeof(DdNode *));
     unique->slots += (slots - oldslots);
     ddFixLimits(unique);
 
@@ -2541,10 +2541,10 @@ ddResizeTable(
                 return(0);
             }
             // unique->memused += (newsize - unique->maxSize) * sizeof(int);
-            Cudd_SetMemoryInUse(unique, unique->memused + (newsize - unique->maxSize) * sizeof(int));
+            Cudd_SetMemUse(unique, unique->memused + (newsize - unique->maxSize) * sizeof(int));
         }
         // unique->memused += (newsize - unique->maxSize) * ((numSlots+1) * sizeof(DdNode *) + 2 * sizeof(int) + sizeof(DdSubtable));
-        Cudd_SetMemoryInUse(unique, unique->memused + (newsize - unique->maxSize) * ((numSlots+1) * sizeof(DdNode *) + 2 * sizeof(int) + sizeof(DdSubtable)));
+        Cudd_SetMemUse(unique, unique->memused + (newsize - unique->maxSize) * ((numSlots+1) * sizeof(DdNode *) + 2 * sizeof(int) + sizeof(DdSubtable)));
         if (newsize > unique->maxSizeZ) {
             FREE(unique->stack);
             unique->stack = ALLOC(DdNodePtr,newsize + 1);
@@ -2561,7 +2561,7 @@ ddResizeTable(
             }
             unique->stack[0] = NULL; /* to suppress harmless UMR */
             // unique->memused += (newsize - ddMax(unique->maxSize,unique->maxSizeZ)) * sizeof(DdNode *);
-            Cudd_SetMemoryInUse(unique, unique->memused + (newsize - ddMax(unique->maxSize,unique->maxSizeZ)) * sizeof(DdNode *));
+            Cudd_SetMemUse(unique, unique->memused + (newsize - ddMax(unique->maxSize,unique->maxSizeZ)) * sizeof(DdNode *));
         }
         for (i = 0; i < oldsize; i++) {
             newsubtables[i].slots = unique->subtables[i].slots;

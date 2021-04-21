@@ -191,7 +191,7 @@ cuddLocalCacheInit(
     cache->lookUps = (double) (int) (cacheSize * cache->minHit + 1);
     cache->hits = 0;
     // manager->memused += cacheSize * cache->itemsize + sizeof(DdLocalCache);
-    Cudd_SetMemoryInUse(manager, manager->memused + cacheSize * cache->itemsize + sizeof(DdLocalCache));
+    Cudd_SetMemUse(manager, manager->memused + cacheSize * cache->itemsize + sizeof(DdLocalCache));
 
     /* Initialize the cache. */
     memset(cache->item, 0, cacheSize * cache->itemsize);
@@ -217,7 +217,7 @@ cuddLocalCacheQuit(
   DdLocalCache * cache /**< cache to be shut down */)
 {
     // cache->manager->memused -= cache->slots * cache->itemsize + sizeof(DdLocalCache);
-    Cudd_SetMemoryInUse(cache->manager, cache->manager->memused - (cache->slots * cache->itemsize + sizeof(DdLocalCache)));
+    Cudd_SetMemUse(cache->manager, cache->manager->memused - (cache->slots * cache->itemsize + sizeof(DdLocalCache)));
     cuddLocalCacheRemoveFromList(cache);
     FREE(cache->item);
     FREE(cache);
@@ -1194,7 +1194,7 @@ cuddLocalCacheResize(
     }
     shift = --(cache->shift);
     // cache->manager->memused += (slots - oldslots) * cache->itemsize;
-    Cudd_SetMemoryInUse(cache->manager, cache->manager->memused + (slots - oldslots) * cache->itemsize);
+    Cudd_SetMemUse(cache->manager, cache->manager->memused + (slots - oldslots) * cache->itemsize);
 
     /* Clear new cache. */
     memset(item, 0, slots * cache->itemsize);
