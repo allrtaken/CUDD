@@ -209,7 +209,7 @@ Cudd_Reserve(
 
 */
 long double
-getMemUse(
+Cudd_GetMemUse(
   const DdManager * unique)
 {
     if (unique->verboseMem) {
@@ -218,7 +218,7 @@ getMemUse(
     }
     return unique->memused;
 
-} /* end of getMemUse */
+} /* end of Cudd_GetMemUse */
 
 
 /**
@@ -260,7 +260,7 @@ cuddAllocNode(
             return(NULL);
         }
         if (unique->stash == NULL || unique->memused > unique->maxmemhard) {
-            getMemUse(unique);
+            Cudd_GetMemUse(unique);
             (void) cuddGarbageCollect(unique,1);
             mem = NULL;
         }
@@ -1540,7 +1540,7 @@ cuddRehash(
     }
 
     if (unique->gcFrac != DD_GC_FRAC_MIN && unique->memused > unique->maxmem) {
-        getMemUse(unique);
+        Cudd_GetMemUse(unique);
         unique->gcFrac = DD_GC_FRAC_MIN;
         unique->minDead = (unsigned) (DD_GC_FRAC_MIN * (double) unique->slots);
         #ifdef DD_VERBOSE

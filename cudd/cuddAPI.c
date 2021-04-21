@@ -3182,6 +3182,7 @@ Cudd_SetMemoryInUse(
   DdManager * dd,
   size_t memUse)
 {
+    Cudd_GetMemUse(dd);
     size_t oldUse = dd->memused;
     dd->memused = memUse;
     return oldUse;

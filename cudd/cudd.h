@@ -627,6 +627,7 @@ extern unsigned int Cudd_ReadOrderRandomization(DdManager * dd);
 extern void Cudd_SetOrderRandomization(DdManager * dd, unsigned int factor);
 extern size_t Cudd_ReadMemoryInUse(DdManager *dd);
 extern size_t Cudd_SetMemoryInUse(DdManager *dd, size_t memUse);
+extern long double Cudd_GetMemUse(const DdManager * unique);
 extern int Cudd_PrintInfo(DdManager *dd, FILE *fp);
 extern long Cudd_ReadPeakNodeCount(DdManager *dd);
 extern int Cudd_ReadPeakLiveNodeCount(DdManager * dd);
