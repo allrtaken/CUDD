@@ -121,7 +121,7 @@ Cudd_Init(
     unique = cuddInitTable(numVars,numVarsZ,numSlots,looseUpTo);
     if (unique == NULL) return(NULL);
     unique->maxmem = maxMemory / 10 * 9;
-    unique->maxmemhard = maxMemory;
+    // unique->maxmemhard = maxMemory; // cuddTable.c: maxmemhard = ~ (size_t) 0
     maxCacheSize = (unsigned int) ((maxMemory / sizeof(DdCache)) / DD_MAX_CACHE_FRACTION);
     result = cuddInitCache(unique,cacheSize,maxCacheSize);
     if (result == 0) return(NULL);

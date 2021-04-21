@@ -501,6 +501,7 @@ struct DdManager {
     void * tohArg; /**< second argument passed to timeout handler */
     /* Statistical counters. */
     size_t threadIndex; /**< to identify distinct managers running in parallel */
+    bool verboseMem; /**< whether function `getMemUse` prints field `memused` */
     size_t memused; /**< total memory allocated for the manager */
     size_t maxmem; /**< target maximum memory */
     size_t maxmemhard; /**< hard limit for maximum memory */

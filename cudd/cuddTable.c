@@ -205,16 +205,20 @@ Cudd_Reserve(
 
 
 /**
-  @brief Prints and returns the memory used by the manager, in bytes.
+  @brief Gets (and possibly prints) the memory used by the manager, in megabytes (1 MB = 1e6 B).
 
 */
-size_t
-printMemUse(
+long double
+getMemUse(
   const DdManager * unique)
 {
-    printf("c cuddUsedBytes_%ld %ld\n", unique->threadIndex + 1, unique->memused);
+    if (unique->verboseMem) {
+        printf("c cuddMegabytes_%zu %Lf\n", unique->threadIndex + 1, unique->memused / 1e6L);
+        fflush(stdout);
+    }
     return unique->memused;
-}
+
+} /* end of getMemUse */
 
 
 /**
@@ -256,7 +260,7 @@ cuddAllocNode(
             return(NULL);
         }
         if (unique->stash == NULL || unique->memused > unique->maxmemhard) {
-            printMemUse(unique);
+            getMemUse(unique);
             (void) cuddGarbageCollect(unique,1);
             mem = NULL;
         }
@@ -607,7 +611,7 @@ cuddInitTable(
     unique->timeoutHandler = NULL;
 
     /* Initialize statistical counters. */
-    unique->maxmemhard = ~ (size_t) 0;
+    unique->maxmemhard = ~ (size_t) 0; // bitwise NOT of unsigned 0 is biggest size_t value
     unique->garbageCollections = 0;
     unique->GCTime = 0;
     unique->reordTime = 0;
@@ -1533,7 +1537,7 @@ cuddRehash(
     }
 
     if (unique->gcFrac != DD_GC_FRAC_MIN && unique->memused > unique->maxmem) {
-        printMemUse(unique);
+        getMemUse(unique);
         unique->gcFrac = DD_GC_FRAC_MIN;
         unique->minDead = (unsigned) (DD_GC_FRAC_MIN * (double) unique->slots);
         #ifdef DD_VERBOSE
