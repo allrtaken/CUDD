@@ -391,16 +391,15 @@ cuddDynamicAllocNode(
         ** warning, and return. */
         (*MMoutOfMemory)(sizeof(DdNode)*(DD_MEM_CHUNK + 1));
         table->errorCode = CUDD_MEMORY_OUT;
-#ifdef DD_VERBOSE
-        (void) fprintf(table->err,
-               "cuddDynamicAllocNode: out of memory");
-        (void) fprintf(table->err,"Memory in use = %lu\n",
-               table->memused);
-#endif
+        #ifdef DD_VERBOSE
+        (void) fprintf(table->err, "cuddDynamicAllocNode: out of memory");
+        (void) fprintf(table->err,"Memory in use = %lu\n", table->memused);
+        #endif
         return(NULL);
     } else { /* successful allocation; slice memory */
         size_t offset;
-        table->memused += (DD_MEM_CHUNK + 1) * sizeof(DdNode);
+        // table->memused += (DD_MEM_CHUNK + 1) * sizeof(DdNode);
+        Cudd_SetMemoryInUse(table, table->memused + (DD_MEM_CHUNK + 1) * sizeof(DdNode));
         mem[0] = (DdNode *) table->memoryList;
         table->memoryList = mem;
 
@@ -851,20 +850,17 @@ cuddSwapInPlace(
         newxlist = ALLOC(DdNodePtr, newxslots);
         MMoutOfMemory = saveHandler;
         if (newxlist == NULL) {
-        (void) fprintf(table->err, "Unable to resize subtable %d for lack of memory\n", i);
+            (void) fprintf(table->err, "Unable to resize subtable %d for lack of memory\n", i);
         } else {
-        table->slots += ((int) newxslots - xslots);
-        table->minDead = (unsigned)
-            (table->gcFrac * (double) table->slots);
-        table->cacheSlack = (int)
-            ddMin(table->maxCacheHard, DD_MAX_CACHE_TO_SLOTS_RATIO
-              * table->slots) - 2 * (int) table->cacheSlots;
-        table->memused +=
-            ((int) newxslots - xslots) * sizeof(DdNodePtr);
-        FREE(xlist);
-        xslots =  newxslots;
-        xshift = newxshift;
-        xlist = newxlist;
+            table->slots += ((int) newxslots - xslots);
+            table->minDead = (unsigned) (table->gcFrac * (double) table->slots);
+            table->cacheSlack = (int) ddMin(table->maxCacheHard, DD_MAX_CACHE_TO_SLOTS_RATIO * table->slots) - 2 * (int) table->cacheSlots;
+            // table->memused += ((int) newxslots - xslots) * sizeof(DdNodePtr);
+            Cudd_SetMemoryInUse(table, table->memused + ((int) newxslots - xslots) * sizeof(DdNodePtr));
+            FREE(xlist);
+            xslots =  newxslots;
+            xshift = newxshift;
+            xlist = newxlist;
         }
         /* Initialize new subtable. */
         for (i = 0; i < xslots; i++) {
