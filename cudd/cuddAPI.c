@@ -3157,7 +3157,7 @@ Cudd_SetOrderRandomization(
 
 
 /**
-  @brief Returns the memory in use by the manager measured in bytes.
+  @brief Returns the memory in use by the manager (in bytes).
 
   @sideeffect None
 
@@ -3169,6 +3169,24 @@ Cudd_ReadMemoryInUse(
     return(dd->memused);
 
 } /* end of Cudd_ReadMemoryInUse */
+
+
+/**
+  @brief Sets the memory in use by the manager (in bytes).
+
+  @return the previous memory usage.
+
+*/
+size_t
+Cudd_SetMemoryInUse(
+  DdManager * dd,
+  size_t memUse)
+{
+    size_t oldUse = dd->memused;
+    dd->memused = memUse;
+    return oldUse;
+
+} /* end of Cudd_SetMemoryInUse */
 
 
 /**

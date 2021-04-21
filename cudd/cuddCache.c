@@ -130,14 +130,16 @@ cuddInitCache(
     ** DD_CACHE_PROFILE is not defined. */
 #ifdef DD_CACHE_PROFILE
     unique->cache = unique->acache;
-    unique->memused += (cacheSize) * sizeof(DdCache);
+    // unique->memused += (cacheSize) * sizeof(DdCache);
+    Cudd_SetMemoryInUse(unique, unique->memused + (cacheSize) * sizeof(DdCache));
 #else
     mem = (DdNodePtr *) unique->acache;
     offset = (ptruint) mem & (sizeof(DdCache) - 1);
     mem += (sizeof(DdCache) - offset) / sizeof(DdNodePtr);
     unique->cache = (DdCache *) mem;
     assert(((ptruint) unique->cache & (sizeof(DdCache) - 1)) == 0);
-    unique->memused += (cacheSize+1) * sizeof(DdCache);
+    // unique->memused += (cacheSize+1) * sizeof(DdCache);
+    Cudd_SetMemoryInUse(unique, unique->memused + (cacheSize+1) * sizeof(DdCache));
 #endif
     unique->cacheSlots = cacheSize;
     unique->cacheShift = sizeof(int) * 8 - logSize;
@@ -891,7 +893,8 @@ cuddCacheResize(
     assert(((ptruint) table->cache & (sizeof(DdCache) - 1)) == 0);
 #endif
     shift = --(table->cacheShift);
-    table->memused += (slots - oldslots) * sizeof(DdCache);
+    // table->memused += (slots - oldslots) * sizeof(DdCache);
+    Cudd_SetMemoryInUse(table, table->memused + (slots - oldslots) * sizeof(DdCache));
     table->cacheSlack -= slots; /* need these many slots to double again */
 
     /* Clear new cache. */
