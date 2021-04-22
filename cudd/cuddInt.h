@@ -501,8 +501,8 @@ struct DdManager {
     void * tohArg; /**< second argument passed to timeout handler */
     /* Multicore fields. */
     size_t threadIndex; /**< to identify distinct managers running in parallel */
-    size_t peakMemUse; /**< max memmory usage so far */
-    bool verboseMem; /**< whether function `Cudd_SetMemUse` prints new mem usage */
+    size_t peakMem; /**< max memmory usage so far */
+    size_t peakMemIncSensitivity; /**< function `Cudd_IncMemUse` prints `memused` if `memused - peakMem > peakMemIncSensitivity` (in bytes) */
     /* Statistical counters. */
     size_t memused; /**< total memory allocated for the manager */
     size_t maxmem; /**< target maximum memory */

@@ -3172,30 +3172,40 @@ Cudd_ReadMemoryInUse(
 
 
 /**
-  @brief Sets the memory usage of the manager (in bytes).
+  @brief Increases the memory usage of the manager (in bytes).
 
-  @return the previous memory usage (in bytes).
-
-  @sideeffect Updates field `peakMemUse`.
+  @sideeffect Updates field `dd->peakMem`.
 
 */
-size_t
-Cudd_SetMemUse(
+void
+Cudd_IncMemUse(
   DdManager * dd,
-  size_t memUse)
+  size_t memUseDiff)
 {
-    if (memUse > dd->peakMemUse) {
-        dd->peakMemUse = memUse;
-        if (dd->verboseMem) {
-            fprintf(stderr, "c cuddMegabytes_%zu %Lf\n", dd->threadIndex + 1, memUse / 1e6L);
+    dd->memused += memUseDiff;
+    if (dd->memused > dd->peakMem) {
+        if (dd->memused - dd->peakMem > dd->peakMemIncSensitivity) {
+            fprintf(stderr, "c cuddMegabytes_%zu %Lf\n", dd->threadIndex + 1, dd->memused / 1e6L);
             fflush(stderr);
         }
+        dd->peakMem = dd->memused;
     }
-    size_t oldUse = dd->memused;
-    dd->memused = memUse;
-    return oldUse;
 
-} /* end of Cudd_SetMemUse */
+} /* end of Cudd_IncMemUse */
+
+
+/**
+  @brief Decreases the memory usage of the manager (in bytes).
+
+*/
+void
+Cudd_DecMemUse(
+  DdManager * dd,
+  size_t memUseDiff)
+{
+    dd->memused -= memUseDiff;
+
+} /* end of Cudd_DecMemUse */
 
 
 /**

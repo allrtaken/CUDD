@@ -1463,7 +1463,7 @@ zddReorderPostprocess(
         }
         FREE(oldnodelist);
 
-        Cudd_SetMemUse(table, table->memused + (slots - oldslots) * sizeof(DdNode *));
+        Cudd_IncMemUse(table, (slots - oldslots) * sizeof(DdNode *));
         table->slots += slots - oldslots;
         table->minDead = (unsigned)(table->gcFrac * (double) table->slots);
         table->cacheSlack = (int) ddMin(table->maxCacheHard, DD_MAX_CACHE_TO_SLOTS_RATIO * table->slots) - 2 * (int) table->cacheSlots;

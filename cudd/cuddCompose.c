@@ -392,7 +392,7 @@ Cudd_SetVarMap (
             manager->errorCode = CUDD_MEMORY_OUT;
             return(0);
         }
-        Cudd_SetMemUse(manager, manager->memused + sizeof(int) * manager->maxSize);
+        Cudd_IncMemUse(manager, sizeof(int) * manager->maxSize);
     }
     /* Initialize the map to the identity. */
     for (i = 0; i < manager->size; i++) { manager->map[i] = i; }

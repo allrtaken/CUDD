@@ -111,10 +111,10 @@ cuddInitCache(
 {
     int i;
     unsigned int logSize;
-#ifndef DD_CACHE_PROFILE
+    #ifndef DD_CACHE_PROFILE
     DdNodePtr *mem;
     ptruint offset;
-#endif
+    #endif
 
     /* Round cacheSize to largest power of 2 not greater than the requested
     ** initial cache size. */
@@ -128,17 +128,17 @@ cuddInitCache(
     /* If the size of the cache entry is a power of 2, we want to
     ** enforce alignment to that power of two. This happens when
     ** DD_CACHE_PROFILE is not defined. */
-#ifdef DD_CACHE_PROFILE
+    #ifdef DD_CACHE_PROFILE
     unique->cache = unique->acache;
-    Cudd_SetMemUse(unique, unique->memused + (cacheSize) * sizeof(DdCache));
-#else
+    Cudd_IncMemUse(unique, (cacheSize) * sizeof(DdCache));
+    #else
     mem = (DdNodePtr *) unique->acache;
     offset = (ptruint) mem & (sizeof(DdCache) - 1);
     mem += (sizeof(DdCache) - offset) / sizeof(DdNodePtr);
     unique->cache = (DdCache *) mem;
     assert(((ptruint) unique->cache & (sizeof(DdCache) - 1)) == 0);
-    Cudd_SetMemUse(unique, unique->memused + (cacheSize+1) * sizeof(DdCache));
-#endif
+    Cudd_IncMemUse(unique, (cacheSize+1) * sizeof(DdCache));
+    #endif
     unique->cacheSlots = cacheSize;
     unique->cacheShift = sizeof(int) * 8 - logSize;
     unique->maxCacheHard = maxCacheSize;
@@ -164,9 +164,9 @@ cuddInitCache(
     for (i = 0; (unsigned) i < cacheSize; i++) {
 	unique->cache[i].h = 0; /* unused slots */
 	unique->cache[i].data = NULL; /* invalid entry */
-#ifdef DD_CACHE_PROFILE
+    #ifdef DD_CACHE_PROFILE
 	unique->cache[i].count = 0;
-#endif
+    #endif
     }
 
     return(1);
@@ -891,7 +891,7 @@ cuddCacheResize(
     assert(((ptruint) table->cache & (sizeof(DdCache) - 1)) == 0);
 #endif
     shift = --(table->cacheShift);
-    Cudd_SetMemUse(table, table->memused + (slots - oldslots) * sizeof(DdCache));
+    Cudd_IncMemUse(table, (slots - oldslots) * sizeof(DdCache));
     table->cacheSlack -= slots; /* need these many slots to double again */
 
     /* Clear new cache. */
