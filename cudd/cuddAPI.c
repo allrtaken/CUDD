@@ -3172,9 +3172,11 @@ Cudd_ReadMemoryInUse(
 
 
 /**
-  @brief Sets the memory in use by the manager (in bytes).
+  @brief Sets the memory usage of the manager (in bytes).
 
-  @return the previous memory usage.
+  @return the previous memory usage (in bytes).
+
+  @sideeffect Updates field `peakMemUse`.
 
 */
 size_t
@@ -3182,7 +3184,13 @@ Cudd_SetMemUse(
   DdManager * dd,
   size_t memUse)
 {
-    Cudd_GetMemUse(dd);
+    if (memUse > dd->peakMemUse) {
+        dd->peakMemUse = memUse;
+        if (dd->verboseMem) {
+            fprintf(stderr, "c cuddMegabytes_%zu %Lf\n", dd->threadIndex + 1, memUse / 1e6L);
+            fflush(stderr);
+        }
+    }
     size_t oldUse = dd->memused;
     dd->memused = memUse;
     return oldUse;

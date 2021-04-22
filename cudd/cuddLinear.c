@@ -696,7 +696,6 @@ cuddInitLinear(
         table->errorCode = CUDD_MEMORY_OUT;
         return(0);
     }
-    // table->memused += words * sizeof(ptruint);
     Cudd_SetMemUse(table, table->memused + words * sizeof(ptruint));
     table->linearSize = nvars;
     for (i = 0; i < words; i++) linear[i] = 0;
@@ -743,7 +742,6 @@ cuddResizeLinear(
         table->errorCode = CUDD_MEMORY_OUT;
         return(0);
     }
-    // table->memused += (words - oldWords) * sizeof(ptruint);
     Cudd_SetMemUse(table, table->memused + (words - oldWords) * sizeof(ptruint));
     for (i = 0; i < words; i++) linear[i] = 0;
 

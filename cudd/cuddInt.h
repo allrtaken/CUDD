@@ -447,12 +447,12 @@ struct DdManager {
     DdNode **memoryList; /**< memory manager for symbol table */
     DdNode *nextFree; /**< list of free nodes */
     char *stash; /**< memory reserve */
-#ifndef DD_NO_DEATH_ROW
+    #ifndef DD_NO_DEATH_ROW
     DdNode **deathRow; /**< queue for dereferencing */
     int deathRowDepth; /**< number of slots in the queue */
     int nextDead; /**< index in the queue */
     unsigned deadMask; /**< mask for circular index update */
-#endif
+    #endif
     /* General Parameters */
     CUDD_VALUE_TYPE epsilon; /**< tolerance on comparisons */
     /* Dynamic Reordering Parameters */
@@ -499,9 +499,11 @@ struct DdManager {
     DD_OOMFP outOfMemCallback; /**< out-of-memory callback */
     DD_TOHFP timeoutHandler; /**< timeout handler */
     void * tohArg; /**< second argument passed to timeout handler */
-    /* Statistical counters. */
+    /* Multicore fields. */
     size_t threadIndex; /**< to identify distinct managers running in parallel */
-    bool verboseMem; /**< whether function `Cudd_GetMemUse` prints field `memused` */
+    size_t peakMemUse; /**< max memmory usage so far */
+    bool verboseMem; /**< whether function `Cudd_SetMemUse` prints new mem usage */
+    /* Statistical counters. */
     size_t memused; /**< total memory allocated for the manager */
     size_t maxmem; /**< target maximum memory */
     size_t maxmemhard; /**< hard limit for maximum memory */
@@ -520,7 +522,7 @@ struct DdManager {
     int32_t cuddRand2; /**< state of the random number generator */
     int32_t shuffleSelect; /**< state of the random number generator */
     int32_t shuffleTable[STAB_SIZE]; /**< state of the random number generator */
-#ifdef DD_STATS
+    #ifdef DD_STATS
     double nodesFreed; /**< number of nodes returned to the free list */
     double nodesDropped; /**< number of nodes killed by dereferencing */
     int totalNISwaps; /**< number of non-interacting (cheap) swaps */
@@ -534,26 +536,26 @@ struct DdManager {
     int totalShuffles; /**< number of shuffles in exact reordering */
     int totalNumberLinearTr; /**< number of linear transformations */
     int num_calls; /**< should equal 2n-1 (n is the # of nodes) */
-#endif
-#ifdef DD_UNIQUE_PROFILE
+    #endif
+    #ifdef DD_UNIQUE_PROFILE
     double uniqueLookUps; /**< number of unique table lookups */
     double uniqueLinks; /**< total distance traveled in coll. chains */
-#endif
-#ifdef DD_COUNT
+    #endif
+    #ifdef DD_COUNT
     double recursiveCalls; /**< number of recursive calls */
-#ifdef DD_STATS
+    #ifdef DD_STATS
     double nextSample; /**< when to write next line of stats */
-#endif
+    #endif
     double swapSteps; /**< number of elementary reordering steps */
-#endif
-#ifdef DD_DEBUG
+    #endif
+    #ifdef DD_DEBUG
     int addPermuteRecurHits; /**< debug variable for variable permutation */
     int bddPermuteRecurHits; /**< debug variable for variable permutation */
     int bddVectorComposeHits; /**< debug variable for vector composition */
     int addVectorComposeHits; /**< debug variable for vector composition */
     int addGeneralVectorComposeHits; /**< debug var. for vector composition */
     int enableExtraDebug; /**< deposit a 1 here to enable more debugging */
-#endif
+    #endif
 };
 
 /**

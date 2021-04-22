@@ -398,7 +398,6 @@ cuddDynamicAllocNode(
         return(NULL);
     } else { /* successful allocation; slice memory */
         size_t offset;
-        // table->memused += (DD_MEM_CHUNK + 1) * sizeof(DdNode);
         Cudd_SetMemUse(table, table->memused + (DD_MEM_CHUNK + 1) * sizeof(DdNode));
         mem[0] = (DdNode *) table->memoryList;
         table->memoryList = mem;
@@ -855,7 +854,6 @@ cuddSwapInPlace(
             table->slots += ((int) newxslots - xslots);
             table->minDead = (unsigned) (table->gcFrac * (double) table->slots);
             table->cacheSlack = (int) ddMin(table->maxCacheHard, DD_MAX_CACHE_TO_SLOTS_RATIO * table->slots) - 2 * (int) table->cacheSlots;
-            // table->memused += ((int) newxslots - xslots) * sizeof(DdNodePtr);
             Cudd_SetMemUse(table, table->memused + ((int) newxslots - xslots) * sizeof(DdNodePtr));
             FREE(xlist);
             xslots =  newxslots;

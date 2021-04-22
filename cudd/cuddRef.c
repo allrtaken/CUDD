@@ -316,7 +316,6 @@ Cudd_DelayedDerefBdd(
             }
             else {
                 int i;
-                // table->memused += table->deathRowDepth;
                 Cudd_SetMemUse(table, table->memused + table->deathRowDepth);
                 i = table->deathRowDepth;
                 table->deathRowDepth <<= 1;

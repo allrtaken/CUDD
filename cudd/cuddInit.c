@@ -174,7 +174,6 @@ Cudd_Init(
     if (unique->sizeZ)
         cuddZddInitUniv(unique);
 
-    // unique->memused += sizeof(DdNode *) * unique->maxSize;
     Cudd_SetMemUse(unique, unique->memused + sizeof(DdNode *) * unique->maxSize);
 
     return(unique);
