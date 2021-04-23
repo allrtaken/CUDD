@@ -3172,6 +3172,20 @@ Cudd_ReadMemoryInUse(
 
 
 /**
+  @brief Prints the memory usage of the manager (in MB).
+
+*/
+void
+Cudd_PrintMemUse(
+  DdManager * dd)
+{
+    fprintf(stderr, "c cuddMegabytes_%zu %Lf\n", dd->threadIndex + 1, dd->memused / 1e6L);
+    fflush(stderr);
+
+} /* end of Cudd_PrintMemUse */
+
+
+/**
   @brief Increases the memory usage of the manager (in bytes).
 
   @sideeffect Updates field `dd->peakMem`.
@@ -3185,8 +3199,7 @@ Cudd_IncMemUse(
     dd->memused += memUseDiff;
     if (dd->memused > dd->peakMem) {
         if (dd->memused - dd->peakMem > dd->peakMemIncSensitivity) {
-            fprintf(stderr, "c cuddMegabytes_%zu %Lf\n", dd->threadIndex + 1, dd->memused / 1e6L);
-            fflush(stderr);
+            Cudd_PrintMemUse(dd);
         }
         dd->peakMem = dd->memused;
     }
@@ -3204,6 +3217,9 @@ Cudd_DecMemUse(
   size_t memUseDiff)
 {
     dd->memused -= memUseDiff;
+
+    fprintf(stderr, "c cuddDecBytes_%zu -%zu\n", dd->threadIndex, memUseDiff);
+    Cudd_PrintMemUse(dd);
 
 } /* end of Cudd_DecMemUse */
 

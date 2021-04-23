@@ -242,7 +242,7 @@ cuddAllocNode(
             unique->errorCode = CUDD_TOO_MANY_NODES;
             return(NULL);
         }
-        if (unique->stash == NULL || unique->memused > unique->maxmemhard) {
+        if (unique->stash == NULL || unique->memused > unique->maxmem) { // maxmemhard = ~ (size_t) 0
             (void) cuddGarbageCollect(unique,1);
             mem = NULL;
         }
