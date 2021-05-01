@@ -3179,8 +3179,11 @@ void
 Cudd_PrintMemUse(
   DdManager * dd)
 {
-    fprintf(stderr, "c cuddMegabytes_%zu %Lf\n", dd->threadIndex + 1, dd->memused / 1e6L);
-    fflush(stderr);
+    size_t megs = dd->memused / 1e6L;
+    if (megs > 16) {
+        fprintf(stderr, "c cuddMegabytes_%zu %zu\n", dd->threadIndex + 1, megs);
+        fflush(stderr);
+    }
 
 } /* end of Cudd_PrintMemUse */
 
