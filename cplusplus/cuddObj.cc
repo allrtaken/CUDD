@@ -1466,7 +1466,7 @@ ADD
 Cudd::addVar(
   int index) const
 {
-    DdNode *result = Cudd_addIthVar(p->manager,index);
+    DdNode *result = Cudd_addIthVar(p->manager, index);
     checkReturnValue(result);
     return ADD(p, result);
 
@@ -1478,7 +1478,7 @@ Cudd::addLogVar(
   int index,
   bool positiveLiteral) const
 {
-    DdNode *result = Cudd_addIthLogVar(p->manager,index,positiveLiteral);
+    DdNode *result = Cudd_addIthLogVar(p->manager, index, positiveLiteral);
     checkReturnValue(result);
     return ADD(p, result);
 

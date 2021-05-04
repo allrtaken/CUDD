@@ -139,18 +139,18 @@ Cudd_addPlus(
     CUDD_VALUE_TYPE value;
 
     F = *f; G = *g;
-    if (F == DD_ZERO(dd)) return(G);
-    if (G == DD_ZERO(dd)) return(F);
+    if (F == DD_ZERO(dd)) return G;
+    if (G == DD_ZERO(dd)) return F;
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
         value = cuddV(F)+cuddV(G);
         res = cuddUniqueConst(dd,value);
-        return(res);
+        return res;
     }
     if (F > G) { /* swap f and g */
         *f = G;
         *g = F;
     }
-    return(NULL);
+    return NULL;
 
 } /* end of Cudd_addPlus */
 
@@ -176,8 +176,8 @@ Cudd_addLogSumExp(
     CUDD_VALUE_TYPE value;
 
     F = *f; G = *g;
-    if (F == DD_MINUS_INFINITY(dd)) return(G);
-    if (G == DD_MINUS_INFINITY(dd)) return(F);
+    if (F == DD_MINUS_INFINITY(dd)) return G;
+    if (G == DD_MINUS_INFINITY(dd)) return F;
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
         CUDD_VALUE_TYPE f, g, m;
         f = cuddV(F);
@@ -185,13 +185,13 @@ Cudd_addLogSumExp(
         m = fmax(f, g);
         value = log(exp(f - m) + exp(g - m)) + m;
         res = cuddUniqueConst(dd,value);
-        return(res);
+        return res;
     }
     if (F > G) { /* swap f and g */
         *f = G;
         *g = F;
     }
-    return(NULL);
+    return NULL;
 
 } /* end of Cudd_addLogSumExp */
 

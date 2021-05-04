@@ -247,7 +247,7 @@ Cudd_bddIsVar(
   @brief Returns the %ADD variable with index i.
 
   @details Retrieves the %ADD variable with index i if it already
-  exists, or creates a new %ADD variable.  An %ADD variable differs from
+  exists, or creates a new %ADD variable. An %ADD variable differs from
   a %BDD variable because it points to the arithmetic zero, instead of
   having a complement pointer to 1.
 
@@ -272,7 +272,7 @@ Cudd_addIthVar(
     }
     do {
         dd->reordered = 0;
-        res = cuddUniqueInter(dd,i,DD_ONE(dd),DD_ZERO(dd));
+        res = cuddUniqueInter(dd, i, DD_ONE(dd), DD_ZERO(dd));
     } while (dd->reordered == 1);
     if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
         dd->timeoutHandler(dd, dd->tohArg);
@@ -313,10 +313,10 @@ Cudd_addIthLogVar(
     do {
         dd->reordered = 0;
         if (positiveLiteral) {
-          res = cuddUniqueInter(dd,i,DD_ZERO(dd),DD_MINUS_INFINITY(dd));
+            res = cuddUniqueInter(dd, i, DD_ZERO(dd), DD_MINUS_INFINITY(dd));
         }
         else {
-          res = cuddUniqueInter(dd,i,DD_MINUS_INFINITY(dd),DD_ZERO(dd));
+            res = cuddUniqueInter(dd, i, DD_MINUS_INFINITY(dd), DD_ZERO(dd));
         }
     } while (dd->reordered == 1);
     if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
