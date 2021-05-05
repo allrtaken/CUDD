@@ -3221,7 +3221,7 @@ Cudd_DecMemUse(
 {
     dd->memused -= memUseDiff;
 
-    fprintf(stderr, "c cuddDecBytes_%zu -%zu\n", dd->threadIndex, memUseDiff);
+    fprintf(stderr, "c cuddDecBytes_%zu %zu\n", dd->threadIndex + 1, memUseDiff);
     Cudd_PrintMemUse(dd);
 
 } /* end of Cudd_DecMemUse */

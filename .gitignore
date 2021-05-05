@@ -13,6 +13,7 @@ dddmp/exp/test5.sh
 dddmp/exp/test6.sh
 dddmp/exp/test7.sh
 doc/cudd.tex
+Doxyfile
 epd/.deps/
 libtool
 Makefile
@@ -192,6 +193,7 @@ doc/cudd.toc
 epd/.dirstamp
 epd/cudd_libcudd_la-epd.lo
 epd/cudd_libcudd_la-epd.o
+html/
 mtr/.dirstamp
 mtr/cudd_libcudd_la-mtrBasic.lo
 mtr/cudd_libcudd_la-mtrBasic.o
