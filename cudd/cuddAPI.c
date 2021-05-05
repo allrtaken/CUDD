@@ -3180,7 +3180,7 @@ Cudd_PrintMemUse(
   DdManager * dd)
 {
     size_t megs = dd->memused / 1e6L;
-    if (megs > 16) {
+    if (megs > 30) {
         fprintf(stderr, "c cuddMegabytes_%zu %zu\n", dd->threadIndex + 1, megs);
         fflush(stderr);
     }
