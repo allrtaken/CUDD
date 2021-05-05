@@ -501,12 +501,12 @@ struct DdManager {
     void * tohArg; /**< second argument passed to timeout handler */
     /* Multicore fields. */
     size_t threadIndex; /**< to identify distinct managers running in parallel */
-    size_t peakMem; /**< max memmory usage so far */
-    size_t peakMemIncSensitivity; /**< function `Cudd_IncMemUse` prints `memused` if `memused - peakMem > peakMemIncSensitivity` (in bytes) */
+    size_t peakMem; /**< max memmory usage so far, in bytes */
+    size_t peakMemIncSensitivity; /**< function `Cudd_IncMemUse` prints `memused` if `memused - peakMem > peakMemIncSensitivity` */
     /* Statistical counters. */
-    size_t memused; /**< total memory allocated for the manager */
-    size_t maxmem; /**< target maximum memory */
-    size_t maxmemhard; /**< hard limit for maximum memory */
+    size_t memused; /**< total memory allocated for the manager, in bytes */
+    size_t maxmem; /**< soft/target maximum memory, in bytes */
+    size_t maxmemhard; /**< hard limit for maximum memory, in bytes */
     int garbageCollections; /**< number of garbage collections */
     unsigned long GCTime; /**< total time spent in garbage collection */
     unsigned long reordTime; /**< total time spent in reordering */
