@@ -156,9 +156,9 @@ Cudd_addPlus(
 
 
 /**
-  @brief Natural log of sum of exponentials (with trick to avoid underflow/overflow).
+  @brief Base-10 log of sum of exponentials (with trick to avoid underflow/overflow).
 
-  @return NULL if not a terminal case; ln(e^f + e^g) otherwise.
+  @return NULL if not a terminal case; log10(10^f + 10^g) otherwise.
 
   @sideeffect None
 
@@ -183,7 +183,7 @@ Cudd_addLogSumExp(
         f = cuddV(F);
         g = cuddV(G);
         m = fmax(f, g);
-        value = log(exp(f - m) + exp(g - m)) + m;
+        value = log10(exp10(f - m) + exp10(g - m)) + m;
         res = cuddUniqueConst(dd,value);
         return res;
     }
