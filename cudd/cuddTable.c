@@ -349,7 +349,7 @@ cuddInitTable(
     /* Initialize multicore fields. */
     unique->threadIndex = 0;
     unique->peakMem = 0;
-    unique->peakMemIncSensitivity = 1e6; // 1 MB
+    unique->peakMemIncSensitivity = 1e9; // 1 GB
 
     sentinel = &(unique->sentinel);
     sentinel->ref = 0;
