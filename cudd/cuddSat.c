@@ -129,9 +129,11 @@ Cudd_Eval(
     ptr = Cudd_Regular(f);
 
     while (!cuddIsConstant(ptr)) {
-        if (inputs[ptr->index] == 1) {
+        int varValue = inputs[ptr->index];
+        if (varValue == 1) {
             ptr = cuddT(ptr);
         } else {
+            assert(varValue == 0);
             comple ^= Cudd_IsComplement(cuddE(ptr));
             ptr = Cudd_Regular(cuddE(ptr));
         }
