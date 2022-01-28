@@ -2684,6 +2684,18 @@ ADD::Threshold(
 
 
 ADD
+ADD::LogThreshold(
+  const ADD& g) const
+{
+    DdManager *mgr = checkSameManager(g);
+    DdNode *result = Cudd_addApply(mgr, Cudd_addLogThreshold, node, g.node);
+    checkReturnValue(result);
+    return ADD(p, result);
+
+} // ADD::LogThreshold
+
+
+ADD
 ADD::SetNZ(
   const ADD& g) const
 {

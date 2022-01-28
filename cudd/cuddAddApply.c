@@ -272,6 +272,40 @@ Cudd_addThreshold(
 
 
 /**
+  @brief f if f&ge;g; minusinfinity if f&lt;g.
+
+  @details Log-threshold operator for Apply (f if f &ge;g; minusinfinity if f&lt;g).
+
+  @return NULL if not a terminal case; f op g otherwise.
+
+  @sideeffect None
+
+  @see Cudd_addApply
+
+*/
+DdNode *
+Cudd_addLogThreshold(
+  DdManager * dd,
+  DdNode ** f,
+  DdNode ** g)
+{
+    DdNode *F, *G;
+
+    F = *f; G = *g;
+    if (F == G || F == DD_PLUS_INFINITY(dd)) return(F);
+    if (cuddIsConstant(F) && cuddIsConstant(G)) {
+        if (cuddV(F) >= cuddV(G)) {
+            return(F);
+        } else {
+            return(DD_MINUS_INFINITY(dd));
+        }
+    }
+    return(NULL);
+
+} /* end of Cudd_addLogThreshold */
+
+
+/**
   @brief This operator sets f to the value of g wherever g != 0.
 
   @return NULL if not a terminal case; f op g otherwise.

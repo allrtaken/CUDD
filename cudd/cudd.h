@@ -672,6 +672,7 @@ extern DdNode * Cudd_addPlus(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addLogSumExp(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addTimes(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addThreshold(DdManager *dd, DdNode **f, DdNode **g);
+extern DdNode * Cudd_addLogThreshold(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addSetNZ(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addDivide(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addMinus(DdManager *dd, DdNode **f, DdNode **g);

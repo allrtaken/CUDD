@@ -322,6 +322,7 @@ public:
     ADD LogSumExp(const ADD& g) const;
     ADD Times(const ADD& g) const;
     ADD Threshold(const ADD& g) const;
+    ADD LogThreshold(const ADD& g) const;
     ADD SetNZ(const ADD& g) const;
     ADD Divide(const ADD& g) const;
     ADD Minus(const ADD& g) const;
