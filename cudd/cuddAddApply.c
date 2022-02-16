@@ -272,9 +272,9 @@ Cudd_addThreshold(
 
 
 /**
-  @brief f if f&ge;g; minusinfinity if f&lt;g.
+  @brief f if f &ge; g - MIN_DIFF; minusinfinity if f &lt; g - MIN_DIFF; where MIN_DIFF = 1e-6.
 
-  @details Log-threshold operator for Apply (f if f &ge;g; minusinfinity if f&lt;g).
+  @details Log-threshold operator for Apply (f if f &ge; g - MIN_DIFF; minusinfinity if f &lt; g - MIN_DIFF).
 
   @return NULL if not a terminal case; f op g otherwise.
 
@@ -289,12 +289,14 @@ Cudd_addLogThreshold(
   DdNode ** f,
   DdNode ** g)
 {
+    const long double MIN_DIFF = 1e-6l;
+
     DdNode *F, *G;
 
     F = *f; G = *g;
     if (F == G || F == DD_PLUS_INFINITY(dd)) return(F);
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
-        if (cuddV(F) >= cuddV(G)) {
+        if (cuddV(F) >= cuddV(G) - MIN_DIFF) {
             return(F);
         } else {
             return(DD_MINUS_INFINITY(dd));
