@@ -722,6 +722,36 @@ Cudd_addXor(
 
 
 /**
+  @brief XOR of two minusinfinity-0 log ADDs.
+
+  @return NULL if not a terminal case; f XOR g otherwise.
+
+  @sideeffect None
+
+*/
+DdNode *
+Cudd_addLogXor(
+  DdManager * dd,
+  DdNode ** f,
+  DdNode ** g)
+{
+    DdNode *F, *G;
+
+    F = *f; G = *g;
+    if (F == G) return(DD_MINUS_INFINITY(dd));
+    if (F == DD_ZERO(dd) && G == DD_MINUS_INFINITY(dd)) return(DD_ZERO(dd));
+    if (G == DD_ZERO(dd) && F == DD_MINUS_INFINITY(dd)) return(DD_ZERO(dd));
+    if (cuddIsConstant(F) && cuddIsConstant(G)) return(DD_MINUS_INFINITY(dd));
+    if (F > G) { /* swap f and g */
+        *f = G;
+        *g = F;
+    }
+    return(NULL);
+
+} /* end of Cudd_addLogXor */
+
+
+/**
   @brief XNOR of two 0-1 ADDs.
 
   @return NULL if not a terminal case; f XNOR g otherwise.

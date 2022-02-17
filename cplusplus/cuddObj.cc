@@ -2840,6 +2840,18 @@ ADD::Xor(
 
 
 ADD
+ADD::LogXor(
+  const ADD& g) const
+{
+    DdManager *mgr = checkSameManager(g);
+    DdNode *result = Cudd_addApply(mgr, Cudd_addLogXor, node, g.node);
+    checkReturnValue(result);
+    return ADD(p, result);
+
+} // ADD::LogXor
+
+
+ADD
 ADD::Xnor(
   const ADD& g) const
 {

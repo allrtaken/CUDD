@@ -685,6 +685,7 @@ extern DdNode * Cudd_addOr(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addNand(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addNor(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addXor(DdManager *dd, DdNode **f, DdNode **g);
+extern DdNode * Cudd_addLogXor(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addXnor(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addMonadicApply(DdManager * dd, DD_MAOP op, DdNode * f);
 extern DdNode * Cudd_addLog(DdManager * dd, DdNode * f);

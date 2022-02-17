@@ -335,6 +335,7 @@ public:
     ADD Nand(const ADD& g) const;
     ADD Nor(const ADD& g) const;
     ADD Xor(const ADD& g) const;
+    ADD LogXor(const ADD& g) const;
     ADD Xnor(const ADD& g) const;
     ADD Log() const;
     ADD FindMax() const;
