@@ -78,6 +78,8 @@
 
 static int addCheckPositiveCube (DdManager *manager, DdNode *cube);
 
+static int addCheckWeightedCube (DdManager *manager, DdNode *cube);
+
 /** \endcond */
 
 
@@ -123,6 +125,34 @@ Cudd_addExistAbstract(
     return(res);
 
 } /* end of Cudd_addExistAbstract */
+
+
+DdNode *
+Cudd_addWeightedExistAbstract(
+  DdManager * manager,
+  DdNode * f,
+  DdNode * weightedCube)
+{
+    DdNode *res;
+
+    if (addCheckWeightedCube(manager, weightedCube) == 0) {
+        (void) fprintf(manager->err,"Error: Cudd_addWeightedExistAbstract can only abstract weighted cubes");
+        return(NULL);
+    }
+
+    do {
+	manager->reordered = 0;
+    // (void) fprintf(manager->err,"Starting WEARecur..\n");
+	res = cuddAddWeightedExistAbstractRecur(manager, f, weightedCube);
+    } while (manager->reordered == 1);
+    if (manager->errorCode == CUDD_TIMEOUT_EXPIRED && manager->timeoutHandler) {
+        manager->timeoutHandler(manager, manager->tohArg);
+    }
+
+    return(res);
+
+} /* end of Cudd_addWeightedExistAbstract */
+
 
 
 /**
@@ -311,6 +341,131 @@ cuddAddExistAbstractRecur(
     }	    
 
 } /* end of cuddAddExistAbstractRecur */
+
+
+/**
+  @brief Performs the recursive step of Cudd_addWeightedExistAbstract.
+
+  @details Returns the %ADD obtained by abstracting the variables of
+  weighted cube from f, if successful; NULL otherwise.
+
+  @sideeffect None
+
+*/
+DdNode *
+cuddAddWeightedExistAbstractRecur(
+  DdManager * manager,
+  DdNode * f,
+  DdNode * weightedCube)
+{
+    DdNode	*T, *E, *res, *res1, *res2, *zero;
+
+    DdNode *scalar;
+
+    statLine(manager);
+    zero = DD_ZERO(manager);
+
+    /* weightedCube is guaranteed to be a weighted cube at this point. */	
+    if (f == zero || cuddIsConstant(weightedCube)) {  
+        assert(f == zero || (weightedCube == DD_ONE(manager)));
+        // if (f==zero) fprintf(manager->err,"f is zero!\n");
+        return(f);
+    }
+
+    /* Abstract a variable that does not appear in f => multiply by 2 if variable is unweighted otherwise multiply by 1 since weights sum to 1 (i.e. do nothing). */
+    if (cuddI(manager,f->index) > cuddI(manager,weightedCube->index)) {
+        // (void) fprintf(manager->err,"WEARecur cond 1..\n");
+    	if (cuddE(weightedCube) == zero){ /* variable is unweighted so multiply by 2 */   	   	
+            res1 = cuddAddWeightedExistAbstractRecur(manager, f, cuddT(weightedCube));
+            if (res1 == NULL) return(NULL);
+            cuddRef(res1);
+            /* Use the "internal" procedure to be alerted in case of
+            ** dynamic reordering. If dynamic reordering occurs, we
+            ** have to abort the entire abstraction.
+            */
+            res = cuddAddWeightedApplyRecur(manager,Cudd_addWeightedPlus,res1,res1, DD_ZERO(manager));
+            if (res == NULL) {
+                Cudd_RecursiveDeref(manager,res1);
+                return(NULL);
+            }
+            cuddRef(res);
+            Cudd_RecursiveDeref(manager,res1);
+            cuddDeref(res);
+            return(res);
+        } /*TODO: Check !!!!! else do nothing since it is a weighted variable and weights sum to 1 
+		NNOOOOO: Need to take care of passed scaleBy value in both cases.
+	    */
+        else{
+            return f;
+        }
+    }
+
+    if ((res = cuddCacheLookup2(manager, Cudd_addWeightedExistAbstract, f, weightedCube)) != NULL) {
+	return(res);
+    }
+
+    checkWhetherToGiveUp(manager);
+
+    T = cuddT(f);
+    E = cuddE(f);
+
+    /* If the two indices are the same, so are their levels. */
+    if (f->index == weightedCube->index) {
+        // (void) fprintf(manager->err,"WEARecur cond 2..\n");
+        res1 = cuddAddWeightedExistAbstractRecur(manager, T, cuddT(weightedCube));
+        if (res1 == NULL) return(NULL);
+            cuddRef(res1);
+        res2 = cuddAddWeightedExistAbstractRecur(manager, E, cuddT(weightedCube));
+        if (res2 == NULL) {
+            Cudd_RecursiveDeref(manager,res1);
+            return(NULL);
+        }
+        cuddRef(res2);
+        if (cuddE(weightedCube) == zero) { /* unweighted var so do plain addplus */
+            res = cuddAddWeightedApplyRecur(manager, Cudd_addWeightedPlus, res1, res2, DD_ZERO(manager));
+        } else {
+            scalar = cuddE(weightedCube);
+            cuddRef(scalar);
+            res = cuddAddWeightedApplyRecur(manager, Cudd_addWeightedPlus, res1, res2, scalar);
+            cuddDeref(scalar);
+        }
+        if (res == NULL) {
+            Cudd_RecursiveDeref(manager,res1);
+            Cudd_RecursiveDeref(manager,res2);
+            return(NULL);
+        }
+        cuddRef(res);
+        Cudd_RecursiveDeref(manager,res1);
+        Cudd_RecursiveDeref(manager,res2);
+        cuddCacheInsert2(manager, Cudd_addWeightedExistAbstract, f, weightedCube, res);
+        cuddDeref(res);
+        return(res);
+    } else { /* if (cuddI(manager,f->index) < cuddI(manager,cube->index)) */
+        // (void) fprintf(manager->err,"WEARecur cond 3..\n");
+        res1 = cuddAddWeightedExistAbstractRecur(manager, T, weightedCube);
+        if (res1 == NULL) return(NULL);
+            cuddRef(res1);
+        res2 = cuddAddWeightedExistAbstractRecur(manager, E, weightedCube);
+        if (res2 == NULL) {
+            Cudd_RecursiveDeref(manager,res1);
+            return(NULL);
+        }
+            cuddRef(res2);
+        res = (res1 == res2) ? res1 :
+            cuddUniqueInter(manager, (int) f->index, res1, res2);
+        if (res == NULL) {
+            Cudd_RecursiveDeref(manager,res1);
+            Cudd_RecursiveDeref(manager,res2);
+            return(NULL);
+        }
+        cuddDeref(res1);
+        cuddDeref(res2);
+        cuddCacheInsert2(manager, Cudd_addWeightedExistAbstract, f, weightedCube, res);
+        return(res);
+    }	    
+
+} /* end of cuddAddWeightedExistAbstractRecur */
+
 
 
 /**
@@ -538,6 +693,30 @@ addCheckPositiveCube(
     if (cuddE(cube) == DD_ZERO(manager)) {
         return(addCheckPositiveCube(manager, cuddT(cube)));
     }
+    return(0);
+
+} /* end of addCheckPositiveCube */
+
+
+/* Does not check for valid constant values of Else edge of vars */
+static int
+addCheckWeightedCube(
+  DdManager * manager,
+  DdNode * cube)
+{
+    if (Cudd_IsComplement(cube)) {
+        fprintf(manager->err,"complement in weightedcube\n");
+        return(0);
+    }
+    if (cube == DD_ONE(manager)) return(1);
+    if (cuddIsConstant(cube)) {
+        fprintf(manager->err,"non-1 constant in weightedcube\n");
+        return(0);
+    }
+    if (cuddIsConstant(cuddE(cube))) {
+        return(addCheckWeightedCube(manager, cuddT(cube)));
+    }
+    fprintf(manager->err,"none of the above in weightedcube. index of else is %d\n",cuddE(cube)->index);
     return(0);
 
 } /* end of addCheckPositiveCube */

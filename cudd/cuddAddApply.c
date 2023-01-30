@@ -155,6 +155,66 @@ Cudd_addPlus(
 } /* end of Cudd_addPlus */
 
 
+DdNode *
+Cudd_addWeightedPlus(
+  DdManager * dd,
+  DdNode ** f,
+  DdNode ** g,
+  DdNode** scalar)
+{
+    DdNode *res, *temp;
+    DdNode *F, *G, *S;
+    CUDD_VALUE_TYPE value, negWt, posWt;
+
+    F = *f; G = *g; S = *scalar;
+    if (F == DD_ZERO(dd)) {
+      if (S != DD_ZERO(dd) ){
+        res = cuddAddApplyRecur(dd, Cudd_addTimes, G, S);
+    	  return res; // not ref-ing since calling function should do that
+      }    	  
+      else { //scalar is 0 means unweighted
+        return G;
+      }
+    }
+    if (G == DD_ZERO(dd)){
+      if (S != DD_ZERO(dd) ){
+        temp = cuddUniqueConst(dd,1-cuddV(S));
+     	  cuddRef(temp);
+        res = cuddAddApplyRecur(dd, Cudd_addTimes, F, temp);
+        cuddDeref(temp);
+    	  return res; // not ref-ing since calling function should do that
+      } else { //scalar is 0 means unweighted
+        return F;
+      }
+    }
+    if (cuddIsConstant(F) && cuddIsConstant(G)) {
+        if (S != DD_ZERO(dd)){
+          negWt = cuddV(S);
+          assert (negWt > 0 && negWt < 1);
+          posWt = 1 - negWt;
+          value = posWt * cuddV(F)+ negWt * cuddV(G);
+          res = cuddUniqueConst(dd,value);
+          return res;
+        } else {
+          value = cuddV(F)+cuddV(G);
+          res = cuddUniqueConst(dd,value);
+          return res;
+        }
+    } 
+    if (F > G) { /* swap f and g */
+        *f = G;
+        *g = F;
+        if (S!=DD_ZERO(dd)){
+          *scalar = cuddUniqueConst(dd,1 - cuddV(S));
+          cuddRef(*scalar);
+        }
+    }
+    return NULL;
+
+} /* end of Cudd_addPlus */
+
+
+
 /**
   @brief Base-10 log of sum of exponentials (with trick to avoid underflow/overflow).
 
@@ -928,6 +988,92 @@ cuddAddApplyRecur(
     return(res);
 
 } /* end of cuddAddApplyRecur */
+
+/* 3 operand operators tags are defined in cuddInt.h and are limited in how 
+they are defined and used. The following helper function helps associate operators (functions)
+with corresponding tags. For new operators, and correspondence to following function
+*/
+int
+getTag(DD_WAOP op){
+  if (op == Cudd_addWeightedPlus){
+    return DD_ADD_WEIGHTED_PLUS_TAG;
+  } else{
+    return NULL;
+  }
+}
+
+DdNode *
+cuddAddWeightedApplyRecur(
+  DdManager * dd,
+  DD_WAOP op,
+  DdNode * f,
+  DdNode * g,
+  DdNode * scalar)
+{
+    DdNode *res,
+           *fv, *fvn, *gv, *gvn,
+           *T, *E;
+    int ford, gord;
+    unsigned int index;
+
+    /* Check terminal cases. Op may swap f and g to increase the
+     * cache hit rate.
+     */
+    statLine(dd);
+    res = (*op)(dd,&f,&g, &scalar); // no need to pass address of scalar since it will not be modified
+    if (res != NULL) return(res);
+
+    /* Check cache. */
+    res = cuddCacheLookup(dd,getTag(op),f,g, scalar);
+    if (res != NULL) return(res);
+
+    checkWhetherToGiveUp(dd);
+
+    /* Recursive step. */
+    ford = cuddI(dd,f->index);
+    gord = cuddI(dd,g->index);
+    if (ford <= gord) {
+        index = f->index;
+        fv = cuddT(f);
+        fvn = cuddE(f);
+    } else {
+        index = g->index;
+        fv = fvn = f;
+    }
+    if (gord <= ford) {
+        gv = cuddT(g);
+        gvn = cuddE(g);
+    } else {
+        gv = gvn = g;
+    }
+
+    T = cuddAddWeightedApplyRecur(dd,op,fv,gv, scalar);
+    if (T == NULL) return(NULL);
+    cuddRef(T);
+
+    E = cuddAddWeightedApplyRecur(dd,op,fvn,gvn, scalar);
+    if (E == NULL) {
+        Cudd_RecursiveDeref(dd,T);
+        return(NULL);
+    }
+    cuddRef(E);
+
+    res = (T == E) ? T : cuddUniqueInter(dd,(int)index,T,E);
+    if (res == NULL) {
+        Cudd_RecursiveDeref(dd, T);
+        Cudd_RecursiveDeref(dd, E);
+        return(NULL);
+    }
+    cuddDeref(T);
+    cuddDeref(E);
+
+    /* Store result. */
+    cuddCacheInsert(dd,getTag(op),f,g,scalar,res);
+
+    return(res);
+
+} /* end of cuddAddApplyRecur */
+
 
 
 /**

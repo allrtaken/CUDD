@@ -368,6 +368,7 @@ public:
     ADD Eval(int * inputs) const;
     bool EqualSupNorm(const ADD& g, CUDD_VALUE_TYPE tolerance, int pr) const;
 
+    ADD WeightedExistAbstract(const ADD& weightedCube) const;
 }; // ADD
 
 

@@ -152,6 +152,7 @@
 #define DD_BDD_MAX_EXP_TAG 0x8a
 #define DD_VARS_SYMM_BEFORE_TAG 0x8e
 #define DD_VARS_SYMM_BETWEEN_TAG 0xa2
+#define DD_ADD_WEIGHTED_PLUS_TAG 0xa6
 
 /* Generator constants. */
 #define CUDD_GEN_CUBES 0
@@ -1056,9 +1057,11 @@ extern "C" {
 #endif
 
 extern DdNode * cuddAddExistAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
+extern DdNode * cuddAddWeightedExistAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * cuddAddUnivAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * cuddAddOrAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * cuddAddApplyRecur(DdManager *dd, DdNode * (*)(DdManager *, DdNode **, DdNode **), DdNode *f, DdNode *g);
+extern DdNode * cuddAddWeightedApplyRecur(DdManager *dd, DdNode * (*)(DdManager *, DdNode **, DdNode **, DdNode**), DdNode *f, DdNode *g, DdNode* scalar);
 extern DdNode * cuddAddMonadicApplyRecur(DdManager * dd, DdNode * (*op)(DdManager *, DdNode *), DdNode * f);
 extern DdNode * cuddAddScalarInverseRecur(DdManager *dd, DdNode *f, DdNode *epsilon);
 extern DdNode * cuddAddIteRecur(DdManager *dd, DdNode *f, DdNode *g, DdNode *h);

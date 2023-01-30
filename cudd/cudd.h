@@ -242,6 +242,10 @@ typedef DdNode * (*DD_PRFP)(DdManager * , int, DdNode **, DdNode **, DdNode **);
 */
 typedef DdNode * (*DD_AOP)(DdManager *, DdNode **, DdNode **);
 /**
+   @brief Type of weighted apply operator.
+*/
+typedef DdNode * (*DD_WAOP)(DdManager *, DdNode **, DdNode **, DdNode**);
+/**
    @brief Type of monadic apply operator.
 */
 typedef DdNode * (*DD_MAOP)(DdManager *, DdNode *);
@@ -665,10 +669,12 @@ extern int Cudd_bddBindVar(DdManager *dd, int index);
 extern int Cudd_bddUnbindVar(DdManager *dd, int index);
 extern int Cudd_bddVarIsBound(DdManager *dd, int index);
 extern DdNode * Cudd_addExistAbstract(DdManager *manager, DdNode *f, DdNode *cube);
+extern DdNode * Cudd_addWeightedExistAbstract(DdManager * manager,  DdNode * f,  DdNode * weightedCube);
 extern DdNode * Cudd_addUnivAbstract(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * Cudd_addOrAbstract(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * Cudd_addApply(DdManager *dd, DD_AOP op, DdNode *f, DdNode *g);
 extern DdNode * Cudd_addPlus(DdManager *dd, DdNode **f, DdNode **g);
+extern DdNode * Cudd_addWeightedPlus(DdManager *dd, DdNode **f, DdNode **g, DdNode** scalar);
 extern DdNode * Cudd_addLogSumExp(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addTimes(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addThreshold(DdManager *dd, DdNode **f, DdNode **g);
