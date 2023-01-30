@@ -131,11 +131,12 @@ DdNode *
 Cudd_addWeightedExistAbstract(
   DdManager * manager,
   DdNode * f,
-  DdNode * weightedCube)
+  DdNode * weightedCube,
+  long double (*getNegWt)(long long))
 {
     DdNode *res;
 
-    if (addCheckWeightedCube(manager, weightedCube) == 0) {
+    if (addCheckPositiveCube(manager, weightedCube) == 0) {
         (void) fprintf(manager->err,"Error: Cudd_addWeightedExistAbstract can only abstract weighted cubes");
         return(NULL);
     }
@@ -143,7 +144,7 @@ Cudd_addWeightedExistAbstract(
     do {
 	manager->reordered = 0;
     // (void) fprintf(manager->err,"Starting WEARecur..\n");
-	res = cuddAddWeightedExistAbstractRecur(manager, f, weightedCube);
+	res = cuddAddWeightedExistAbstractRecur(manager, f, weightedCube, getNegWt);
     } while (manager->reordered == 1);
     if (manager->errorCode == CUDD_TIMEOUT_EXPIRED && manager->timeoutHandler) {
         manager->timeoutHandler(manager, manager->tohArg);
@@ -356,7 +357,8 @@ DdNode *
 cuddAddWeightedExistAbstractRecur(
   DdManager * manager,
   DdNode * f,
-  DdNode * weightedCube)
+  DdNode * weightedCube,
+  long double (*getNegWt)(long long))
 {
     DdNode	*T, *E, *res, *res1, *res2, *zero;
 
@@ -375,15 +377,15 @@ cuddAddWeightedExistAbstractRecur(
     /* Abstract a variable that does not appear in f => multiply by 2 if variable is unweighted otherwise multiply by 1 since weights sum to 1 (i.e. do nothing). */
     if (cuddI(manager,f->index) > cuddI(manager,weightedCube->index)) {
         // (void) fprintf(manager->err,"WEARecur cond 1..\n");
-    	if (cuddE(weightedCube) == zero){ /* variable is unweighted so multiply by 2 */   	   	
-            res1 = cuddAddWeightedExistAbstractRecur(manager, f, cuddT(weightedCube));
-            if (res1 == NULL) return(NULL);
-            cuddRef(res1);
-            /* Use the "internal" procedure to be alerted in case of
-            ** dynamic reordering. If dynamic reordering occurs, we
-            ** have to abort the entire abstraction.
-            */
-            res = cuddAddWeightedApplyRecur(manager,Cudd_addWeightedPlus,res1,res1, DD_ZERO(manager));
+    	res1 = cuddAddWeightedExistAbstractRecur(manager, f, cuddT(weightedCube), getNegWt);
+        if (res1 == NULL) return(NULL);
+        cuddRef(res1);
+        /* Use the "internal" procedure to be alerted in case of
+        ** dynamic reordering. If dynamic reordering occurs, we
+        ** have to abort the entire abstraction.
+        */
+        if ((*getNegWt)(weightedCube->index) == 1){ /* variable is unweighted so multiply by 2 */    
+            res = cuddAddWeightedApplyRecur(manager,Cudd_addWeightedPlus,res1,res1, DD_ONE(manager));
             if (res == NULL) {
                 Cudd_RecursiveDeref(manager,res1);
                 return(NULL);
@@ -392,11 +394,10 @@ cuddAddWeightedExistAbstractRecur(
             Cudd_RecursiveDeref(manager,res1);
             cuddDeref(res);
             return(res);
-        } /*TODO: Check !!!!! else do nothing since it is a weighted variable and weights sum to 1 
-		NNOOOOO: Need to take care of passed scaleBy value in both cases.
-	    */
+        } 
         else{
-            return f;
+            cuddDeref(res1);
+            return(res1);
         }
     }
 
@@ -412,23 +413,27 @@ cuddAddWeightedExistAbstractRecur(
     /* If the two indices are the same, so are their levels. */
     if (f->index == weightedCube->index) {
         // (void) fprintf(manager->err,"WEARecur cond 2..\n");
-        res1 = cuddAddWeightedExistAbstractRecur(manager, T, cuddT(weightedCube));
+        res1 = cuddAddWeightedExistAbstractRecur(manager, T, cuddT(weightedCube), getNegWt);
         if (res1 == NULL) return(NULL);
             cuddRef(res1);
-        res2 = cuddAddWeightedExistAbstractRecur(manager, E, cuddT(weightedCube));
+        res2 = cuddAddWeightedExistAbstractRecur(manager, E, cuddT(weightedCube), getNegWt);
         if (res2 == NULL) {
             Cudd_RecursiveDeref(manager,res1);
             return(NULL);
         }
         cuddRef(res2);
-        if (cuddE(weightedCube) == zero) { /* unweighted var so do plain addplus */
-            res = cuddAddWeightedApplyRecur(manager, Cudd_addWeightedPlus, res1, res2, DD_ZERO(manager));
-        } else {
-            scalar = cuddE(weightedCube);
-            cuddRef(scalar);
-            res = cuddAddWeightedApplyRecur(manager, Cudd_addWeightedPlus, res1, res2, scalar);
-            cuddDeref(scalar);
-        }
+        // if (cuddE(weightedCube) == zero) { /* unweighted var so do plain addplus */
+        //     res = cuddAddWeightedApplyRecur(manager, Cudd_addWeightedPlus, res1, res2, DD_ZERO(manager));
+        // } else {
+        //     scalar = cuddE(weightedCube);
+        //     cuddRef(scalar);
+        //     res = cuddAddWeightedApplyRecur(manager, Cudd_addWeightedPlus, res1, res2, scalar);
+        //     cuddDeref(scalar);
+        // }
+        long double negWt = (*getNegWt)(f->index);
+        scalar = cuddUniqueConst(manager,negWt);
+        cuddRef(scalar);
+        res = cuddAddWeightedApplyRecur(manager, Cudd_addWeightedPlus, res1, res2, scalar);
         if (res == NULL) {
             Cudd_RecursiveDeref(manager,res1);
             Cudd_RecursiveDeref(manager,res2);
@@ -438,14 +443,15 @@ cuddAddWeightedExistAbstractRecur(
         Cudd_RecursiveDeref(manager,res1);
         Cudd_RecursiveDeref(manager,res2);
         cuddCacheInsert2(manager, Cudd_addWeightedExistAbstract, f, weightedCube, res);
+        // cuddDeref(scalar);
         cuddDeref(res);
         return(res);
     } else { /* if (cuddI(manager,f->index) < cuddI(manager,cube->index)) */
         // (void) fprintf(manager->err,"WEARecur cond 3..\n");
-        res1 = cuddAddWeightedExistAbstractRecur(manager, T, weightedCube);
+        res1 = cuddAddWeightedExistAbstractRecur(manager, T, weightedCube, getNegWt);
         if (res1 == NULL) return(NULL);
             cuddRef(res1);
-        res2 = cuddAddWeightedExistAbstractRecur(manager, E, weightedCube);
+        res2 = cuddAddWeightedExistAbstractRecur(manager, E, weightedCube, getNegWt);
         if (res2 == NULL) {
             Cudd_RecursiveDeref(manager,res1);
             return(NULL);

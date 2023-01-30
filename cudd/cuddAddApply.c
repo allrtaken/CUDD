@@ -168,7 +168,7 @@ Cudd_addWeightedPlus(
 
     F = *f; G = *g; S = *scalar;
     if (F == DD_ZERO(dd)) {
-      if (S != DD_ZERO(dd) ){
+      if (S != DD_ONE(dd) ){
         res = cuddAddApplyRecur(dd, Cudd_addTimes, G, S);
     	  return res; // not ref-ing since calling function should do that
       }    	  
@@ -177,19 +177,20 @@ Cudd_addWeightedPlus(
       }
     }
     if (G == DD_ZERO(dd)){
-      if (S != DD_ZERO(dd) ){
+      if (S != DD_ONE(dd) ){
         temp = cuddUniqueConst(dd,1-cuddV(S));
      	  cuddRef(temp);
         res = cuddAddApplyRecur(dd, Cudd_addTimes, F, temp);
-        cuddDeref(temp);
+        // cuddDeref(temp);
     	  return res; // not ref-ing since calling function should do that
       } else { //scalar is 0 means unweighted
         return F;
       }
     }
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
-        if (S != DD_ZERO(dd)){
+        if (S != DD_ONE(dd)){
           negWt = cuddV(S);
+          // fprintf(dd->err,"%lf\n",negWt);
           assert (negWt > 0 && negWt < 1);
           posWt = 1 - negWt;
           value = posWt * cuddV(F)+ negWt * cuddV(G);
@@ -204,9 +205,10 @@ Cudd_addWeightedPlus(
     if (F > G) { /* swap f and g */
         *f = G;
         *g = F;
-        if (S!=DD_ZERO(dd)){
+        if (S!=DD_ONE(dd)){
           *scalar = cuddUniqueConst(dd,1 - cuddV(S));
           cuddRef(*scalar);
+          // cuddDeref(S);
         }
     }
     return NULL;

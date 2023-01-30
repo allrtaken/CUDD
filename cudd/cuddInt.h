@@ -1057,7 +1057,7 @@ extern "C" {
 #endif
 
 extern DdNode * cuddAddExistAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
-extern DdNode * cuddAddWeightedExistAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
+extern DdNode * cuddAddWeightedExistAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube, long double (*)(long long));
 extern DdNode * cuddAddUnivAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * cuddAddOrAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * cuddAddApplyRecur(DdManager *dd, DdNode * (*)(DdManager *, DdNode **, DdNode **), DdNode *f, DdNode *g);

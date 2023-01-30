@@ -5147,7 +5147,7 @@ ADD::EqualSupNorm(
 
 
 ADD
-ADD::WeightedExistAbstract(const ADD& weightedCube) const //not including log counting right now because cache storage requires exactly 2 operands
+ADD::WeightedExistAbstract(const ADD& weightedCube, long double (*getNegWt)(long long)) const //not including log counting right now because cache storage requires exactly 2 operands
 {
     // in case of regular (non log) counting:
     // weighted cube has positive edge of vars going to either 1 or another var in the cube and the negative edge going to the weight w of negative literal such that 0<w<1
@@ -5162,7 +5162,7 @@ ADD::WeightedExistAbstract(const ADD& weightedCube) const //not including log co
     // if negative edge points to DD_MINUS_INFINITY then variable is taken to be unweighted
     DdManager *mgr = checkSameManager(weightedCube);
     DdNode* result;
-    result = Cudd_addWeightedExistAbstract(mgr, node, weightedCube.node);
+    result = Cudd_addWeightedExistAbstract(mgr, node, weightedCube.node, getNegWt);
     checkReturnValue(result);
     return ADD(p, result);
 
