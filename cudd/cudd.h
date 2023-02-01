@@ -675,6 +675,7 @@ extern DdNode * Cudd_addOrAbstract(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * Cudd_addApply(DdManager *dd, DD_AOP op, DdNode *f, DdNode *g);
 extern DdNode * Cudd_addPlus(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addWeightedPlus(DdManager *dd, DdNode **f, DdNode **g, DdNode** scalar);
+extern DdNode * Cudd_addWeightedLogSumExp(DdManager *dd, DdNode **f, DdNode **g, DdNode** scalar);
 extern DdNode * Cudd_addLogSumExp(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addTimes(DdManager *dd, DdNode **f, DdNode **g);
 extern DdNode * Cudd_addThreshold(DdManager *dd, DdNode **f, DdNode **g);

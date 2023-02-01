@@ -369,6 +369,7 @@ public:
     bool EqualSupNorm(const ADD& g, CUDD_VALUE_TYPE tolerance, int pr) const;
 
     ADD WeightedExistAbstract(const ADD& weightedCube, long double (*)(long long)) const;
+    ADD WeightedLogSumExistAbstract(const ADD& weightedCube, long double (*)(long long)) const;
 }; // ADD
 
 

@@ -5168,6 +5168,28 @@ ADD::WeightedExistAbstract(const ADD& cube, long double (*getNegWt)(long long)) 
 
 } // ADD::WeightedExistAbstract
 
+ADD
+ADD::WeightedLogSumExistAbstract(const ADD& cube, long double (*getNegWt)(long long)) const //not including log counting right now because cache storage requires exactly 2 operands
+{
+    // in case of regular (non log) counting:
+    // weighted cube has positive edge of vars going to either 1 or another var in the cube and the negative edge going to the weight w of negative literal such that 0<w<1
+    // if negative edge of any var goes to 0 then that var is considered unweighted, i.e. both positive and negative literal weights are one.
+    // by mcc21 format, all weights are assumed to sum to 1 except the unweighted case. So the positive literal weight is computed implicitly as 1-w where w is the constant pointed by negative edge
+    // note that negative edge cannot point to 1 as in that case both positive and negative edges point to 1 and that variable will be omitted
+    // the 2 cases when either literal weight is 0 and other is 1 is assumed to not exist for now as it hard to represent and can be handled by setting that var to true or false
+    
+    // in case of logCounting
+    // everything is as above just interpreted in log fashion
+    // positive edge always points to log(1) = 0. negative edge points to log(wt(~x)).
+    // if negative edge points to DD_MINUS_INFINITY then variable is taken to be unweighted
+    DdManager *mgr = checkSameManager(cube);
+    DdNode* result;
+    result = Cudd_addWeightedAbstract(mgr, node, cube.node, getNegWt, Cudd_addWeightedLogSumExp, DD_MINUS_INFINITY(mgr));
+    checkReturnValue(result);
+    return ADD(p, result);
+
+} // ADD::WeightedExistAbstract
+
 
 
 BDD

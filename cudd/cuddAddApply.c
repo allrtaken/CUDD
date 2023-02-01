@@ -218,7 +218,7 @@ Cudd_addWeightedPlus(
     }
     return NULL;
 
-} /* end of Cudd_addPlus */
+} /* end of Cudd_addWeightedPlus */
 
 
 
@@ -276,6 +276,80 @@ Cudd_addLogSumExp(
   @see Cudd_addApply
 
 */
+
+
+DdNode *
+Cudd_addWeightedLogSumExp(
+  DdManager * dd,
+  DdNode ** f,
+  DdNode ** g,
+  DdNode** scalar)
+{
+    DdNode *res, *temp;
+    DdNode *F, *G, *S;
+    CUDD_VALUE_TYPE value, negWt, posWt;
+
+    F = *f; G = *g; S = *scalar;
+    if (F == DD_MINUS_INFINITY(dd)) {
+      if (S != DD_ZERO(dd) ){
+        res = cuddAddApplyRecur(dd, Cudd_addPlus, G, S); // no need to use Cudd_addLogSumExp as it is just normal summation (since its originally a product)
+    	  return res; // not ref-ing since calling function should do that
+      }    	  
+      else { //scalar is 0 means unweighted
+        return G;
+      }
+    }
+    if (G == DD_MINUS_INFINITY(dd)){
+      if (S != DD_ZERO(dd) ){
+        temp = cuddUniqueConst(dd,log10(1-exp10(cuddV(S))));
+     	  cuddRef(temp);
+        res = cuddAddApplyRecur(dd, Cudd_addPlus, F, temp);
+        // cuddDeref(temp);   //gives error if uncommented
+    	  return res; // not ref-ing since calling function should do that
+      } else { //scalar is 0 means unweighted
+        return F;
+      }
+    }
+    if (G == F){ /* same DD */
+      if (S != DD_ZERO(dd)){ /* In weighted case, weighted sum of same DD is the same as weights sum to 1 */
+        return F;
+      }
+    }
+    if (cuddIsConstant(F) && cuddIsConstant(G)) {
+        CUDD_VALUE_TYPE f, g, m;
+        if (S != DD_ZERO(dd)){
+          negWt = cuddV(S);
+          // fprintf(dd->err,"%lf\n",negWt);
+          assert (negWt > cuddV(DD_MINUS_INFINITY(dd)) && negWt < 0);
+          posWt = log10(1-exp10(cuddV(S)));
+          f = cuddV(F) + posWt;
+          g = cuddV(G) + negWt;
+          m = fmax(f, g);
+          value = log10(exp10(f - m) + exp10(g - m)) + m;
+          res = cuddUniqueConst(dd,value);
+          return res;
+        } else {
+          f = cuddV(F);
+          g = cuddV(G);
+          m = fmax(f, g);
+          value = log10(exp10(f - m) + exp10(g - m)) + m;
+          res = cuddUniqueConst(dd,value);
+          return res;
+        }
+    } 
+    if (F > G) { /* swap f and g */
+        *f = G;
+        *g = F;
+        if (S!=DD_ZERO(dd)){
+          *scalar = cuddUniqueConst(dd,log10(1-exp10(cuddV(S))));
+          cuddRef(*scalar);
+          // cuddDeref(S);   //gives error if uncommented
+        }
+    }
+    return NULL;
+}  /* end of Cudd_addWeightedLogSumExp */
+
+
 DdNode *
 Cudd_addTimes(
   DdManager * dd,
@@ -1008,9 +1082,13 @@ int
 getTag(DD_WAOP opOuter, DD_WAOP opInner){
   if (opOuter == cuddAddWeightedApplyRecur && opInner == Cudd_addWeightedPlus){
     return DD_ADD_WEIGHTED_APPLY_PLUS_TAG;
+  } else if (opOuter == cuddAddWeightedApplyRecur && opInner == Cudd_addWeightedLogSumExp){
+    return DD_ADD_WEIGHTED_APPLY_LOGSUM_TAG;
   } else if (opOuter == cuddAddWeightedAbstractRecur && opInner == Cudd_addWeightedPlus){
     return DD_ADD_WEIGHTED_ABS_PLUS_TAG;
-  }else{
+  }else if(opOuter == cuddAddWeightedAbstractRecur && opInner == Cudd_addWeightedLogSumExp){
+    return DD_ADD_WEIGHTED_ABS_LOGSUM_TAG;
+  } else{
     return NULL;
   }
 }
