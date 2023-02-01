@@ -181,9 +181,14 @@ Cudd_addWeightedPlus(
         temp = cuddUniqueConst(dd,1-cuddV(S));
      	  cuddRef(temp);
         res = cuddAddApplyRecur(dd, Cudd_addTimes, F, temp);
-        // cuddDeref(temp);
+        // cuddDeref(temp);   //gives error if uncommented
     	  return res; // not ref-ing since calling function should do that
       } else { //scalar is 0 means unweighted
+        return F;
+      }
+    }
+    if (G == F){ /* same DD */
+      if (S != DD_ONE(dd)){ /* In weighted case, weighted sum of same DD is the same as weights sum to 1 */
         return F;
       }
     }
@@ -208,7 +213,7 @@ Cudd_addWeightedPlus(
         if (S!=DD_ONE(dd)){
           *scalar = cuddUniqueConst(dd,1 - cuddV(S));
           cuddRef(*scalar);
-          // cuddDeref(S);
+          // cuddDeref(S);   //gives error if uncommented
         }
     }
     return NULL;
@@ -993,13 +998,19 @@ cuddAddApplyRecur(
 
 /* 3 operand operators tags are defined in cuddInt.h and are limited in how 
 they are defined and used. The following helper function helps associate operators (functions)
-with corresponding tags. For new operators, and correspondence to following function
+with corresponding tags. For new operators, add correspondence to following function
+
+Eg: if using weightedPlus within weightedApply, opOuter will be weightedApply
+opInner will be weightedPlus
+
 */
 int
-getTag(DD_WAOP op){
-  if (op == Cudd_addWeightedPlus){
-    return DD_ADD_WEIGHTED_PLUS_TAG;
-  } else{
+getTag(DD_WAOP opOuter, DD_WAOP opInner){
+  if (opOuter == cuddAddWeightedApplyRecur && opInner == Cudd_addWeightedPlus){
+    return DD_ADD_WEIGHTED_APPLY_PLUS_TAG;
+  } else if (opOuter == cuddAddWeightedAbstractRecur && opInner == Cudd_addWeightedPlus){
+    return DD_ADD_WEIGHTED_ABS_PLUS_TAG;
+  }else{
     return NULL;
   }
 }
@@ -1026,7 +1037,7 @@ cuddAddWeightedApplyRecur(
     if (res != NULL) return(res);
 
     /* Check cache. */
-    res = cuddCacheLookup(dd,getTag(op),f,g, scalar);
+    res = cuddCacheLookup(dd,getTag(cuddAddWeightedApplyRecur, op),f,g, scalar);
     if (res != NULL) return(res);
 
     checkWhetherToGiveUp(dd);
@@ -1070,7 +1081,7 @@ cuddAddWeightedApplyRecur(
     cuddDeref(E);
 
     /* Store result. */
-    cuddCacheInsert(dd,getTag(op),f,g,scalar,res);
+    cuddCacheInsert(dd,getTag(cuddAddWeightedApplyRecur, op),f,g,scalar,res);
 
     return(res);
 

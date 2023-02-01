@@ -152,7 +152,10 @@
 #define DD_BDD_MAX_EXP_TAG 0x8a
 #define DD_VARS_SYMM_BEFORE_TAG 0x8e
 #define DD_VARS_SYMM_BETWEEN_TAG 0xa2
-#define DD_ADD_WEIGHTED_PLUS_TAG 0xa6
+#define DD_ADD_WEIGHTED_APPLY_PLUS_TAG 0xa6
+#define DD_ADD_WEIGHTED_APPLY_LOGSUM_TAG 0xaa
+#define DD_ADD_WEIGHTED_ABS_PLUS_TAG 0xae
+#define DD_ADD_WEIGHTED_ABS_LOGSUM_TAG 0xc2
 
 /* Generator constants. */
 #define CUDD_GEN_CUBES 0
@@ -1057,7 +1060,7 @@ extern "C" {
 #endif
 
 extern DdNode * cuddAddExistAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
-extern DdNode * cuddAddWeightedExistAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube, long double (*)(long long));
+extern DdNode * cuddAddWeightedAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube, long double (*getNegWt)(long long), DD_WAOP op, DdNode* opZero);
 extern DdNode * cuddAddUnivAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * cuddAddOrAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * cuddAddApplyRecur(DdManager *dd, DdNode * (*)(DdManager *, DdNode **, DdNode **), DdNode *f, DdNode *g);
@@ -1239,6 +1242,8 @@ extern int cuddZddSymmCheck(DdManager *table, int x, int y);
 extern int cuddZddSymmSifting(DdManager *table, int lower, int upper);
 extern int cuddZddSymmSiftingConv(DdManager *table, int lower, int upper);
 extern int cuddZddP(DdManager *zdd, DdNode *f);
+
+extern int getTag(DD_WAOP opOuter, DD_WAOP opInner);
 
 #ifdef __cplusplus
 } /* end of extern "C" */

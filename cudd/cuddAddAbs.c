@@ -128,15 +128,17 @@ Cudd_addExistAbstract(
 
 
 DdNode *
-Cudd_addWeightedExistAbstract(
+Cudd_addWeightedAbstract(
   DdManager * manager,
   DdNode * f,
-  DdNode * weightedCube,
-  long double (*getNegWt)(long long))
+  DdNode * cube,
+  long double (*getNegWt)(long long),
+  DD_WAOP op,
+  DdNode* opZero)
 {
     DdNode *res;
 
-    if (addCheckPositiveCube(manager, weightedCube) == 0) {
+    if (addCheckPositiveCube(manager, cube) == 0) {
         (void) fprintf(manager->err,"Error: Cudd_addWeightedExistAbstract can only abstract weighted cubes");
         return(NULL);
     }
@@ -144,7 +146,7 @@ Cudd_addWeightedExistAbstract(
     do {
 	manager->reordered = 0;
     // (void) fprintf(manager->err,"Starting WEARecur..\n");
-	res = cuddAddWeightedExistAbstractRecur(manager, f, weightedCube, getNegWt);
+	res = cuddAddWeightedAbstractRecur(manager, f, cube, getNegWt, op, opZero);
     } while (manager->reordered == 1);
     if (manager->errorCode == CUDD_TIMEOUT_EXPIRED && manager->timeoutHandler) {
         manager->timeoutHandler(manager, manager->tohArg);
@@ -354,54 +356,54 @@ cuddAddExistAbstractRecur(
 
 */
 DdNode *
-cuddAddWeightedExistAbstractRecur(
+cuddAddWeightedAbstractRecur(
   DdManager * manager,
   DdNode * f,
-  DdNode * weightedCube,
-  long double (*getNegWt)(long long))
+  DdNode * cube,
+  long double (*getNegWt)(long long),
+  DD_WAOP op,
+  DdNode* opZero)
 {
-    DdNode	*T, *E, *res, *res1, *res2, *zero;
+    DdNode	*T, *E, *res, *res1, *res2; // *zero;
 
     DdNode *scalar;
 
     statLine(manager);
-    zero = DD_ZERO(manager);
+    // zero = DD_ZERO(manager);
 
     /* weightedCube is guaranteed to be a weighted cube at this point. */	
-    if (f == zero || cuddIsConstant(weightedCube)) {  
-        assert(f == zero || (weightedCube == DD_ONE(manager)));
+    if (f == opZero || cuddIsConstant(cube)) {  
+        assert(f == opZero || (cube == DD_ONE(manager)));
         // if (f==zero) fprintf(manager->err,"f is zero!\n");
         return(f);
     }
 
     /* Abstract a variable that does not appear in f => multiply by 2 if variable is unweighted otherwise multiply by 1 since weights sum to 1 (i.e. do nothing). */
-    if (cuddI(manager,f->index) > cuddI(manager,weightedCube->index)) {
+    if (cuddI(manager,f->index) > cuddI(manager,cube->index)) {
         // (void) fprintf(manager->err,"WEARecur cond 1..\n");
-    	res1 = cuddAddWeightedExistAbstractRecur(manager, f, cuddT(weightedCube), getNegWt);
+    	res1 = cuddAddWeightedAbstractRecur(manager, f, cuddT(cube), getNegWt, op, opZero);
         if (res1 == NULL) return(NULL);
         cuddRef(res1);
         /* Use the "internal" procedure to be alerted in case of
         ** dynamic reordering. If dynamic reordering occurs, we
         ** have to abort the entire abstraction.
         */
-        if ((*getNegWt)(weightedCube->index) == 1){ /* variable is unweighted so multiply by 2 */    
-            res = cuddAddWeightedApplyRecur(manager,Cudd_addWeightedPlus,res1,res1, DD_ONE(manager));
-            if (res == NULL) {
-                Cudd_RecursiveDeref(manager,res1);
-                return(NULL);
-            }
-            cuddRef(res);
+
+        long double negWt = (*getNegWt)(cube->index);
+        scalar = cuddUniqueConst(manager,negWt);
+        cuddRef(scalar);    
+        res = cuddAddWeightedApplyRecur(manager,op,res1,res1, scalar);
+        if (res == NULL) {
             Cudd_RecursiveDeref(manager,res1);
-            cuddDeref(res);
-            return(res);
-        } 
-        else{
-            cuddDeref(res1);
-            return(res1);
+            return(NULL);
         }
+        cuddRef(res);
+        Cudd_RecursiveDeref(manager,res1);
+        cuddDeref(res);
+        return(res);
     }
 
-    if ((res = cuddCacheLookup2(manager, Cudd_addWeightedExistAbstract, f, weightedCube)) != NULL) {
+    if ((res = cuddCacheLookup(manager, getTag(cuddAddWeightedAbstractRecur,op), f, cube, opZero)) != NULL) {
 	return(res);
     }
 
@@ -411,12 +413,12 @@ cuddAddWeightedExistAbstractRecur(
     E = cuddE(f);
 
     /* If the two indices are the same, so are their levels. */
-    if (f->index == weightedCube->index) {
+    if (f->index == cube->index) {
         // (void) fprintf(manager->err,"WEARecur cond 2..\n");
-        res1 = cuddAddWeightedExistAbstractRecur(manager, T, cuddT(weightedCube), getNegWt);
+        res1 = cuddAddWeightedAbstractRecur(manager, T, cuddT(cube), getNegWt, op, opZero);
         if (res1 == NULL) return(NULL);
             cuddRef(res1);
-        res2 = cuddAddWeightedExistAbstractRecur(manager, E, cuddT(weightedCube), getNegWt);
+        res2 = cuddAddWeightedAbstractRecur(manager, E, cuddT(cube), getNegWt, op, opZero);
         if (res2 == NULL) {
             Cudd_RecursiveDeref(manager,res1);
             return(NULL);
@@ -430,10 +432,10 @@ cuddAddWeightedExistAbstractRecur(
         //     res = cuddAddWeightedApplyRecur(manager, Cudd_addWeightedPlus, res1, res2, scalar);
         //     cuddDeref(scalar);
         // }
-        long double negWt = (*getNegWt)(f->index);
+        long double negWt = (*getNegWt)(cube->index);
         scalar = cuddUniqueConst(manager,negWt);
         cuddRef(scalar);
-        res = cuddAddWeightedApplyRecur(manager, Cudd_addWeightedPlus, res1, res2, scalar);
+        res = cuddAddWeightedApplyRecur(manager, op, res1, res2, scalar);
         if (res == NULL) {
             Cudd_RecursiveDeref(manager,res1);
             Cudd_RecursiveDeref(manager,res2);
@@ -442,16 +444,16 @@ cuddAddWeightedExistAbstractRecur(
         cuddRef(res);
         Cudd_RecursiveDeref(manager,res1);
         Cudd_RecursiveDeref(manager,res2);
-        cuddCacheInsert2(manager, Cudd_addWeightedExistAbstract, f, weightedCube, res);
-        // cuddDeref(scalar);
+        cuddCacheInsert(manager, getTag(cuddAddWeightedAbstractRecur,op), f, cube, opZero, res);
+        // cuddDeref(scalar);  //gives error if uncommented
         cuddDeref(res);
         return(res);
     } else { /* if (cuddI(manager,f->index) < cuddI(manager,cube->index)) */
         // (void) fprintf(manager->err,"WEARecur cond 3..\n");
-        res1 = cuddAddWeightedExistAbstractRecur(manager, T, weightedCube, getNegWt);
+        res1 = cuddAddWeightedAbstractRecur(manager, T, cube, getNegWt, op, opZero);
         if (res1 == NULL) return(NULL);
             cuddRef(res1);
-        res2 = cuddAddWeightedExistAbstractRecur(manager, E, weightedCube, getNegWt);
+        res2 = cuddAddWeightedAbstractRecur(manager, E, cube, getNegWt, op, opZero);
         if (res2 == NULL) {
             Cudd_RecursiveDeref(manager,res1);
             return(NULL);
@@ -466,7 +468,7 @@ cuddAddWeightedExistAbstractRecur(
         }
         cuddDeref(res1);
         cuddDeref(res2);
-        cuddCacheInsert2(manager, Cudd_addWeightedExistAbstract, f, weightedCube, res);
+        cuddCacheInsert(manager, getTag(cuddAddWeightedAbstractRecur,op), f, cube, opZero, res);
         return(res);
     }	    
 
