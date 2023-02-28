@@ -370,6 +370,7 @@ public:
 
     ADD WeightedExistAbstract(const ADD& weightedCube, long double (*)(long long)) const;
     ADD WeightedLogSumExistAbstract(const ADD& weightedCube, long double (*)(long long)) const;
+    ADD LogSumExistAbstract(const ADD& cube) const;
 }; // ADD
 
 

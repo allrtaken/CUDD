@@ -156,6 +156,44 @@ Cudd_addWeightedAbstract(
 
 } /* end of Cudd_addWeightedExistAbstract */
 
+/**
+  @brief Existentially Abstracts all the variables in cube from f.
+
+  @details Abstracts all the variables in cube from f by summing
+  over all possible values taken by the variables.
+
+  @return the abstracted %ADD.
+
+  @sideeffect None
+
+  @see Cudd_addUnivAbstract Cudd_bddExistAbstract
+  Cudd_addOrAbstract
+
+*/
+DdNode *
+Cudd_addLogSumExistAbstract(
+  DdManager * manager,
+  DdNode * f,
+  DdNode * cube)
+{
+    DdNode *res;
+
+    if (addCheckPositiveCube(manager, cube) == 0) {
+        (void) fprintf(manager->err,"Error: Can only abstract cubes");
+        return(NULL);
+    }
+
+    do {
+	manager->reordered = 0;
+	res = cuddAddLogSumExistAbstractRecur(manager, f, cube);
+    } while (manager->reordered == 1);
+    if (manager->errorCode == CUDD_TIMEOUT_EXPIRED && manager->timeoutHandler) {
+        manager->timeoutHandler(manager, manager->tohArg);
+    }
+
+    return(res);
+
+} /* end of Cudd_addExistAbstract */
 
 
 /**
@@ -474,6 +512,107 @@ cuddAddWeightedAbstractRecur(
 
 } /* end of cuddAddWeightedExistAbstractRecur */
 
+/**
+  @brief Performs the recursive step of Cudd_addExistAbstract.
+
+  @details Returns the %ADD obtained by abstracting the variables of
+  cube from f, if successful; NULL otherwise.
+
+  @sideeffect None
+
+*/
+DdNode *
+cuddAddLogSumExistAbstractRecur(
+  DdManager * manager,
+  DdNode * f,
+  DdNode * cube)
+{
+    DdNode	*T, *E, *res, *res1, *res2, *zero;
+
+    statLine(manager);
+    zero = DD_MINUS_INFINITY(manager); // since zero in log case is minus infinity
+
+    /* Cube is guaranteed to be a cube at this point. */	
+    if (f == zero || cuddIsConstant(cube)) {  
+        return(f);
+    }
+
+    /* Abstract a variable that does not appear in f => multiply by 2. */
+    if (cuddI(manager,f->index) > cuddI(manager,cube->index)) {
+	res1 = cuddAddLogSumExistAbstractRecur(manager, f, cuddT(cube));
+	if (res1 == NULL) return(NULL);
+	cuddRef(res1);
+	/* Use the "internal" procedure to be alerted in case of
+	** dynamic reordering. If dynamic reordering occurs, we
+	** have to abort the entire abstraction.
+	*/
+	res = cuddAddApplyRecur(manager,Cudd_addLogSumExp,res1,res1);
+	if (res == NULL) {
+	    Cudd_RecursiveDeref(manager,res1);
+	    return(NULL);
+	}
+	cuddRef(res);
+	Cudd_RecursiveDeref(manager,res1);
+	cuddDeref(res);
+        return(res);
+    }
+
+    if ((res = cuddCacheLookup2(manager, Cudd_addLogSumExistAbstract, f, cube)) != NULL) {
+	return(res);
+    }
+
+    checkWhetherToGiveUp(manager);
+
+    T = cuddT(f);
+    E = cuddE(f);
+
+    /* If the two indices are the same, so are their levels. */
+    if (f->index == cube->index) {
+	res1 = cuddAddLogSumExistAbstractRecur(manager, T, cuddT(cube));
+	if (res1 == NULL) return(NULL);
+        cuddRef(res1);
+	res2 = cuddAddLogSumExistAbstractRecur(manager, E, cuddT(cube));
+	if (res2 == NULL) {
+	    Cudd_RecursiveDeref(manager,res1);
+	    return(NULL);
+	}
+        cuddRef(res2);
+	res = cuddAddApplyRecur(manager, Cudd_addLogSumExp, res1, res2);
+	if (res == NULL) {
+	    Cudd_RecursiveDeref(manager,res1);
+	    Cudd_RecursiveDeref(manager,res2);
+	    return(NULL);
+	}
+	cuddRef(res);
+	Cudd_RecursiveDeref(manager,res1);
+	Cudd_RecursiveDeref(manager,res2);
+	cuddCacheInsert2(manager, Cudd_addLogSumExistAbstract, f, cube, res);
+	cuddDeref(res);
+        return(res);
+    } else { /* if (cuddI(manager,f->index) < cuddI(manager,cube->index)) */
+	res1 = cuddAddLogSumExistAbstractRecur(manager, T, cube);
+	if (res1 == NULL) return(NULL);
+        cuddRef(res1);
+	res2 = cuddAddLogSumExistAbstractRecur(manager, E, cube);
+	if (res2 == NULL) {
+	    Cudd_RecursiveDeref(manager,res1);
+	    return(NULL);
+	}
+        cuddRef(res2);
+	res = (res1 == res2) ? res1 :
+	    cuddUniqueInter(manager, (int) f->index, res1, res2);
+	if (res == NULL) {
+	    Cudd_RecursiveDeref(manager,res1);
+	    Cudd_RecursiveDeref(manager,res2);
+	    return(NULL);
+	}
+	cuddDeref(res1);
+	cuddDeref(res2);
+	cuddCacheInsert2(manager, Cudd_addLogSumExistAbstract, f, cube, res);
+        return(res);
+    }	    
+
+} /* end of cuddAddExistAbstractRecur */
 
 
 /**

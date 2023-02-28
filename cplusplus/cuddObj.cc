@@ -5190,6 +5190,15 @@ ADD::WeightedLogSumExistAbstract(const ADD& cube, long double (*getNegWt)(long l
 
 } // ADD::WeightedExistAbstract
 
+ADD
+ADD::LogSumExistAbstract(const ADD& cube) const {
+    DdManager *mgr = checkSameManager(cube);
+    DdNode* result;
+    result = Cudd_addLogSumExistAbstract(mgr, node, cube.node);
+    checkReturnValue(result);
+    return ADD(p, result);
+
+} // ADD::LogSumExistAbstract
 
 
 BDD

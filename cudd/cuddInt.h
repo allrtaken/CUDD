@@ -1060,6 +1060,7 @@ extern "C" {
 #endif
 
 extern DdNode * cuddAddExistAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
+extern DdNode * cuddAddLogSumExistAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * cuddAddWeightedAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube, long double (*getNegWt)(long long), DD_WAOP op, DdNode* opZero);
 extern DdNode * cuddAddUnivAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
 extern DdNode * cuddAddOrAbstractRecur(DdManager *manager, DdNode *f, DdNode *cube);
