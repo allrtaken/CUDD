@@ -247,7 +247,7 @@ Cudd_bddIsVar(
   @brief Returns the %ADD variable with index i.
 
   @details Retrieves the %ADD variable with index i if it already
-  exists, or creates a new %ADD variable. An %ADD variable differs from
+  exists, or creates a new %ADD variable.  An %ADD variable differs from
   a %BDD variable because it points to the arithmetic zero, instead of
   having a complement pointer to 1.
 
@@ -272,7 +272,7 @@ Cudd_addIthVar(
     }
     do {
         dd->reordered = 0;
-        res = cuddUniqueInter(dd, i, DD_ONE(dd), DD_ZERO(dd));
+        res = cuddUniqueInter(dd,i,DD_ONE(dd),DD_ZERO(dd));
     } while (dd->reordered == 1);
     if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
         dd->timeoutHandler(dd, dd->tohArg);
@@ -313,10 +313,10 @@ Cudd_addIthLogVar(
     do {
         dd->reordered = 0;
         if (positiveLiteral) {
-            res = cuddUniqueInter(dd, i, DD_ZERO(dd), DD_MINUS_INFINITY(dd));
+          res = cuddUniqueInter(dd,i,DD_ZERO(dd),DD_MINUS_INFINITY(dd));
         }
         else {
-            res = cuddUniqueInter(dd, i, DD_MINUS_INFINITY(dd), DD_ZERO(dd));
+          res = cuddUniqueInter(dd,i,DD_MINUS_INFINITY(dd),DD_ZERO(dd));
         }
     } while (dd->reordered == 1);
     if (dd->errorCode == CUDD_TIMEOUT_EXPIRED && dd->timeoutHandler) {
@@ -3157,7 +3157,7 @@ Cudd_SetOrderRandomization(
 
 
 /**
-  @brief Returns the memory in use by the manager (in bytes).
+  @brief Returns the memory in use by the manager measured in bytes.
 
   @sideeffect None
 
@@ -3169,59 +3169,6 @@ Cudd_ReadMemoryInUse(
     return(dd->memused);
 
 } /* end of Cudd_ReadMemoryInUse */
-
-
-/**
-  @brief Prints the memory usage of the manager (in MB).
-
-*/
-void
-Cudd_PrintMemUse(
-  DdManager * dd)
-{
-    size_t megs = dd->memused / 1e6;
-    fprintf(stderr, "c cuddMegabytes_%zu %zu\n", dd->threadIndex + 1, megs);
-    fflush(stderr);
-
-} /* end of Cudd_PrintMemUse */
-
-
-/**
-  @brief Increases the memory usage of the manager (in bytes).
-
-  @sideeffect Updates field `dd->peakMem`.
-
-*/
-void
-Cudd_IncMemUse(
-  DdManager * dd,
-  size_t memUseDiff)
-{
-    dd->memused += memUseDiff;
-    if (dd->memused > dd->peakMem) {
-        if (dd->memused - dd->peakMem > dd->peakMemIncSensitivity) {
-            Cudd_PrintMemUse(dd);
-        }
-        dd->peakMem = dd->memused;
-    }
-
-} /* end of Cudd_IncMemUse */
-
-
-/**
-  @brief Decreases the memory usage of the manager (in bytes).
-
-*/
-void
-Cudd_DecMemUse(
-  DdManager * dd,
-  size_t memUseDiff)
-{
-    dd->memused -= memUseDiff;
-    fprintf(stderr, "c cuddDecBytes_%zu %zu\n", dd->threadIndex + 1, memUseDiff);
-    Cudd_PrintMemUse(dd);
-
-} /* end of Cudd_DecMemUse */
 
 
 /**
