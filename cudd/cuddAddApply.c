@@ -190,6 +190,13 @@ Cudd_addWeightedPlus(
     if (G == F){ /* same DD */
       if (S != DD_ONE(dd)){ /* In weighted case, weighted sum of same DD is the same as weights sum to 1 */
         return F;
+      } else{ /*The variable is unweighted so multiply F by 2*/
+        temp = cuddUniqueConst(dd,2);
+     	  cuddRef(temp);
+        res = cuddAddApplyRecur(dd, Cudd_addTimes, F, temp);
+        fprintf(dd->err,"c c WARNING: This branch in cudd_addweightedplus has not been tested. Check solution\n");
+        return res;
+        // exit(1);
       }
     }
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
@@ -262,21 +269,9 @@ Cudd_addLogSumExp(
 
 } /* end of Cudd_addLogSumExp */
 
-
-/**
-  @brief Integer and floating point multiplication.
-
-  @details This function can be used also to take the AND of two 0-1
-  ADDs.
-
-  @return NULL if not a terminal case; f * g otherwise.
-
-  @sideeffect None
-
-  @see Cudd_addApply
-
+/*
+Assumes f,g are in logscale but scalar is NOT in logscale. Conversion of scalar to logscale will be done in the function
 */
-
 
 DdNode *
 Cudd_addWeightedLogSumExp(
@@ -291,17 +286,23 @@ Cudd_addWeightedLogSumExp(
 
     F = *f; G = *g; S = *scalar;
     if (F == DD_MINUS_INFINITY(dd)) {
-      if (S != DD_ZERO(dd) ){
-        res = cuddAddApplyRecur(dd, Cudd_addPlus, G, S); // no need to use Cudd_addLogSumExp as it is just normal summation (since its originally a product)
-    	  return res; // not ref-ing since calling function should do that
+      // if (S != DD_ZERO(dd) ){
+      if (S != DD_ONE(dd) ){
+        temp = cuddUniqueConst(dd,log10(cuddV(S)));
+        cuddRef(temp);
+        res = cuddAddApplyRecur(dd, Cudd_addPlus, G, temp); // no need to use Cudd_addLogSumExp as it is just normal summation (since its originally a product)
+    	  // cuddDeref(temp);   //gives error if uncommented
+        return res; // not ref-ing since calling function should do that
       }    	  
       else { //scalar is 0 means unweighted
         return G;
       }
     }
     if (G == DD_MINUS_INFINITY(dd)){
-      if (S != DD_ZERO(dd) ){
-        temp = cuddUniqueConst(dd,log10(1-exp10(cuddV(S))));
+      // if (S != DD_ZERO(dd) ){
+      if (S != DD_ONE(dd) ){
+        // temp = cuddUniqueConst(dd,log10(1-exp10(cuddV(S))));
+        temp = cuddUniqueConst(dd,log10(1-cuddV(S)));
      	  cuddRef(temp);
         res = cuddAddApplyRecur(dd, Cudd_addPlus, F, temp);
         // cuddDeref(temp);   //gives error if uncommented
@@ -311,19 +312,31 @@ Cudd_addWeightedLogSumExp(
       }
     }
     if (G == F){ /* same DD */
-      if (S != DD_ZERO(dd)){ /* In weighted case, weighted sum of same DD is the same as weights sum to 1 */
+      if (S != DD_ONE(dd)){ /* In weighted case, weighted sum of same DD is the same as weights sum to 1 */
         return F;
+      }else{ /*The variable is unweighted so multiply F by 2*/
+        temp = cuddUniqueConst(dd,log10(2));
+     	  cuddRef(temp);
+        res = cuddAddApplyRecur(dd, Cudd_addPlus, F, temp);
+        fprintf(dd->err,"c c WARNING: This branch in cudd_addweightedlogsumexp has not been tested. Check solution\n");
+        return res;
+        // exit(1);
       }
     }
     if (cuddIsConstant(F) && cuddIsConstant(G)) {
         CUDD_VALUE_TYPE f, g, m;
-        if (S != DD_ZERO(dd)){
+        // if (S != DD_ZERO(dd)){
+        if (S != DD_ONE(dd)){  
           negWt = cuddV(S);
           // fprintf(dd->err,"%lf\n",negWt);
-          assert (negWt > cuddV(DD_MINUS_INFINITY(dd)) && negWt < 0);
-          posWt = log10(1-exp10(cuddV(S)));
-          f = cuddV(F) + posWt;
-          g = cuddV(G) + negWt;
+          // assert (negWt > cuddV(DD_MINUS_INFINITY(dd)) && negWt < 0);
+          assert (negWt > 0 && negWt < 1);
+          // posWt = log10(1-exp10(cuddV(S)));
+          posWt = 1 - negWt;
+          // f = cuddV(F) + posWt;
+          // g = cuddV(G) + negWt;
+          f = cuddV(F) + log10(posWt);
+          g = cuddV(G) + log10(negWt);
           m = fmax(f, g);
           value = log10(exp10(f - m) + exp10(g - m)) + m;
           res = cuddUniqueConst(dd,value);
@@ -340,8 +353,10 @@ Cudd_addWeightedLogSumExp(
     if (F > G) { /* swap f and g */
         *f = G;
         *g = F;
-        if (S!=DD_ZERO(dd)){
-          *scalar = cuddUniqueConst(dd,log10(1-exp10(cuddV(S))));
+        // if (S!=DD_ZERO(dd)){
+        if (S != DD_ONE(dd)){
+          // *scalar = cuddUniqueConst(dd,log10(1-exp10(cuddV(S))));
+          *scalar = cuddUniqueConst(dd,1-cuddV(S));
           cuddRef(*scalar);
           // cuddDeref(S);   //gives error if uncommented
         }
@@ -349,6 +364,20 @@ Cudd_addWeightedLogSumExp(
     return NULL;
 }  /* end of Cudd_addWeightedLogSumExp */
 
+
+/**
+  @brief Integer and floating point multiplication.
+
+  @details This function can be used also to take the AND of two 0-1
+  ADDs.
+
+  @return NULL if not a terminal case; f * g otherwise.
+
+  @sideeffect None
+
+  @see Cudd_addApply
+
+*/
 
 DdNode *
 Cudd_addTimes(
