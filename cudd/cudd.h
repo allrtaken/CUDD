@@ -508,6 +508,8 @@ typedef void (*DD_TOHFP)(DdManager *, void *);
 extern "C" {
 #endif
 
+extern int ddReorderPreprocess(DdManager * table);
+
 extern DdNode * Cudd_addNewVar(DdManager *dd);
 extern DdNode * Cudd_addNewVarAtLevel(DdManager *dd, int level);
 extern DdNode * Cudd_bddNewVar(DdManager *dd);

@@ -79,7 +79,8 @@ static int ddSiftingAux (DdManager *table, int x, int xLow, int xHigh);
 static Move * ddSiftingUp (DdManager *table, int y, int xLow);
 static Move * ddSiftingDown (DdManager *table, int x, int xHigh);
 static int ddSiftingBackward (DdManager *table, int size, Move *moves);
-static int ddReorderPreprocess (DdManager *table);
+// static int ddReorderPreprocess (DdManager *table);
+int ddReorderPreprocess (DdManager *table);
 static int ddReorderPostprocess (DdManager *table);
 static int ddShuffle (DdManager *table, int *permutation);
 static int ddSiftUp (DdManager *table, int x, int xLow);
@@ -1768,7 +1769,8 @@ ddSiftingBackward(
   @sideeffect None
 
 */
-static int
+// static int
+int //removing static to allow access from outside
 ddReorderPreprocess(
   DdManager * table)
 {
